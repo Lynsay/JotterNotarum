@@ -16,8 +16,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	
-	<script>/* set theme before first paint to avoid a flash; mark that JavaScript is available */
-	(function(){document.documentElement.className+=' js';try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+	<script src="js/theme.js"></script>
 	<meta name="color-scheme" content="light dark">
 	<title>Advanced - Jotter Notarum: Feedback Generator</title>
 	<script src="js/jquery-3.4.1.min.js"></script>
@@ -86,7 +85,7 @@
 				<div class="adv-col"><!--left column: steps 1 to 3-->
 					<div class="form-group roundedCornerDiv"><!--for the student list-->
 							<h2 class="instructionHeader" id="studentHeading"><span class="step-badge">1</span><span>Select your student list</span></h2>
-							<p>This must be a .txt file with one student name per line.  See the <a href="sample-class-list.txt" target="_blank">sample class list</a>.</p>
+							<p>This must be a .txt file with one student name per line.  See the <a href="samples/sample-class-list.txt" target="_blank">sample class list</a>.</p>
 							<p><label class="btn btn-primary">
 								Browse<input type="file" accept=".txt" class="sr-only-input" name="classList" id="classListFile">
 							</label> <span id="classListStatus" role="status" aria-live="polite"></span></p>

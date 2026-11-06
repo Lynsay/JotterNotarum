@@ -15,8 +15,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<script>/* set theme before first paint to avoid a flash; mark that JavaScript is available */
-	(function(){document.documentElement.className+=' js';try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+	<script src="js/theme.js"></script>
 	<meta name="color-scheme" content="light dark">
 	<title>Instructions - Jotter Notarum: Feedback Generator</title>
 	<script src="js/jquery-3.4.1.min.js"></script>
@@ -92,7 +91,7 @@
 							<p>You need to select a .txt file to load into Jotter Notarum.  This file should contain your commonly used comments.  Hit "Browse" to select a file.</p>
 							<img class="img-fluid img-thumbnail instructionImages mx-auto d-block" src="gfx/stepOne.png" alt="step one image" />
 
-							<p>Your feedback .txt file must be formatted in a specific way.  Section headings must start with a <b>#</b>.  The end of a section is denoted by a new line containing a <b>*</b>.  Blank lines will be ignored.  Ensure each line of feedback ends with a fullstop.  To help you, a <a href="sample-feedback.txt" target="_blank">sample feedback file</a> has been provided.</p>
+							<p>Your feedback .txt file must be formatted in a specific way.  Section headings must start with a <b>#</b>.  The end of a section is denoted by a new line containing a <b>*</b>.  Blank lines will be ignored.  Ensure each line of feedback ends with a fullstop.  To help you, a <a href="samples/sample-feedback.txt" target="_blank">sample feedback file</a> has been provided.</p>
 
 							<img class="img-fluid img-thumbnail instructionImages mx-auto d-block" src="gfx/feedbackEx.png" alt="feedback example image" />
 						
@@ -115,7 +114,7 @@
 						<img class="img-fluid img-thumbnail instructionImages mx-auto d-block" src="gfx/stepFour.png" alt="step four image" />
 
 						<h3 class="instructionHeaderPage">Advanced page: export to Word</h3>
-						<p>The <a href="advanced.html">Advanced</a> page has the same steps as the main page, with a student list added at the start.  In Step 1, load a .txt file with one student name per line (here is a <a href="sample-class-list.txt" target="_blank">sample class list</a>).  The names appear in a small scrollable box, and the student you pick is highlighted.  Then load your comments file, select phrases and generate the feedback as usual.  In Step 5 you can copy the feedback, save it as a Word file for the selected student, or add it to one combined Word file, with each student starting on a new page.  "Clear feedback" empties the page and, if you leave the box ticked, selects the next student in your list.  In Chrome and Edge the combined file is updated in place.  In other browsers it is downloaded again each time you add a student.  Nothing is uploaded; see <a href="privacy.html">Privacy</a>.</p>
+						<p>The <a href="advanced.html">Advanced</a> page has the same steps as the main page, with a student list added at the start.  In Step 1, load a .txt file with one student name per line (here is a <a href="samples/sample-class-list.txt" target="_blank">sample class list</a>).  The names appear in a small scrollable box, and the student you pick is highlighted.  Then load your comments file, select phrases and generate the feedback as usual.  In Step 5 you can copy the feedback, save it as a Word file for the selected student, or add it to one combined Word file, with each student starting on a new page.  "Clear feedback" empties the page and, if you leave the box ticked, selects the next student in your list.  In Chrome and Edge the combined file is updated in place.  In other browsers it is downloaded again each time you add a student.  Nothing is uploaded; see <a href="privacy.html">Privacy</a>.</p>
 
 						<p>Questions about privacy, or about who made Jotter Notarum? See the <a href="privacy.html">Privacy</a> and <a href="about.html">About</a> pages.</p>
 
