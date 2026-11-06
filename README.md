@@ -18,9 +18,10 @@ See the [LICENSE](LICENSE) file for details.
 
 ## Third-party libraries
 
-These are bundled under their own licences (all MIT), which remain in force for those files:
+These are bundled under their own licences (MIT, or MIT/GPL-3.0 dual-licensed for JSZip), which remain in force for those files:
 
 - Bootstrap 4.3.1 (css/, js/): https://getbootstrap.com/
 - jQuery 3.4.1 (js/): https://jquery.com/
 - clipboard.js 2.0.4 (js/): https://clipboardjs.com/
-- he 1.x (js/he.js): https://github.com/mathiasbynens/he
+- he 1.2.0 (js/he.js): https://github.com/mathiasbynens/he
+- JSZip 3.10.1 (js/jszip.min.js, used by the Advanced page; MIT or GPL-3.0): https://stuk.github.io/jszip/

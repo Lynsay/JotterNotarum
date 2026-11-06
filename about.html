@@ -1,0 +1,116 @@
+<!--
+	Desc: About the student feedback generator.
+
+    Author: Lynsay A. Shepherd
+
+    Date: October 2019
+    Updated: November 2026
+
+-->
+
+<!doctype html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script>/* set theme before first paint to avoid a flash; mark that JavaScript is available */
+	(function(){document.documentElement.className+=' js';try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+	<meta name="color-scheme" content="light dark">
+	<title>About - Jotter Notarum: Feedback Generator</title>
+	<link rel="icon" type="image/svg+xml" href="gfx/favicon.svg">
+	<link rel="icon" type="image/png" sizes="32x32" href="gfx/favicon-32.png">
+	<link rel="icon" type="image/png" sizes="64x64" href="gfx/favicon-64.png">
+	<link rel="apple-touch-icon" href="gfx/apple-touch-icon.png">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/override.css">
+</head>
+<body>
+	<a class="skip-link" href="#main">Skip to main content</a>
+	<header class="site-top">
+		<nav class="site-nav" aria-label="Main">
+			<button type="button" id="navToggle" class="nav-toggle" aria-expanded="false" aria-controls="navMenu">Menu</button>
+			<ul id="navMenu" class="nav-links">
+				<li><a href="index.html">Home</a></li>
+				<li><a href="advanced.html">Advanced</a></li>
+				<li><a href="instructions.html">Instructions</a></li>
+				<li><a href="privacy.html">Privacy</a></li>
+				<li><a href="about.html" aria-current="page">About</a></li>
+			</ul>
+			<button type="button" id="themeToggle" class="theme-toggle" aria-pressed="false"><span class="track" aria-hidden="true"></span>Dark mode</button>
+		</nav>
+	</header>
+		<main id="main" class="container-fluid" tabindex="-1">
+
+				<div class="row ">
+						<div class="col-md-12 form-group site-header">
+							<svg class="site-logo" viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <defs>
+    <!-- knocks the pencil's silhouette out of the notepad so the lines don't show through it -->
+    <mask id="logo-gap" maskUnits="userSpaceOnUse" x="0" y="0" width="120" height="120">
+      <rect width="120" height="120" fill="#fff"/>
+      <g transform="translate(47 103) rotate(135)" stroke="#000" stroke-width="11" fill="#000">
+        <path d="M0 0 L-16 -8 L-62 -8 L-62 8 L-16 8 Z"/>
+      </g>
+    </mask>
+  </defs>
+  <g mask="url(#logo-gap)">
+    <!-- pad -->
+    <rect x="20" y="22" width="64" height="82" rx="9"/>
+    <!-- spiral binding -->
+    <path d="M34 14v16M48 14v16M62 14v16M76 14v16"/>
+    <!-- written lines + tick -->
+    <path d="M32 48l5 5 9-10"/>
+    <path d="M54 47h20M32 66h42M32 82h26"/>
+  </g>
+  <!-- pencil -->
+  <g transform="translate(47 103) rotate(135)">
+    <path d="M0 0 L-16 -8 L-16 8 Z"/>               <!-- tip -->
+    <path d="M-16 -8 H-62 V8 H-16"/>                <!-- body -->
+    <path d="M-50 -8 V8"/>                          <!-- ferrule -->
+  </g>
+</svg>
+							<div class="site-header-text">
+								<h1 id="mainHeaderText"><span class="brand-name">Jotter Notarum</span><span class="brand-sub">: Feedback Generator</span><span class="brand-sub"> - About</span></h1>
+							</div>
+						</div>
+					</div>
+
+			<div class="row ">
+				<div class="col-md-12 form-group roundedCornerDivInstruct">
+
+					<h2 class="instructionHeaderPage">What is Jotter Notarum?</h2>
+					<p>Jotter Notarum is a comment-bank tool for marking.  You load your own bank of frequently used feedback comments, tick the ones that apply to a student's work, and generate feedback that you can edit and copy into your marking system.  It was first written in 2019 and given a new look, dark mode, the option to add comments as you go, and a round of accessibility work in 2026.</p>
+
+					<h3 class="instructionHeaderPage">The name</h3>
+					<p>A <i>jotter</i> is the Scots word for a notebook, the kind used for taking notes at school.  <i>Notarum</i> is Latin for "of the notes" (the genitive plural of <i>nota</i>, a note).  Together: a notebook of notes.</p>
+
+					<h3 class="instructionHeaderPage">Who made it?</h3>
+					<p>Written by <a href="https://www.abertay.ac.uk/staff-search/dr-lynsay-shepherd/">Dr Lynsay Shepherd</a>.  Any issues or ideas?  Email <a href="mailto:lynsay.shepherd@abertay.ac.uk?Subject=%5BIssue%5D%20Jotter%20Notarum%3A%20Feedback%20Generator">lynsay.shepherd@abertay.ac.uk</a>.</p>
+
+					<h3 class="instructionHeaderPage">Licence and source code</h3>
+					<p>Jotter Notarum is free software, released under the <a href="LICENSE">GNU Affero General Public License version 3 (AGPL-3.0)</a>.  The source code is on <a href="https://github.com/Lynsay/JotterNotarum">GitHub</a>.</p>
+
+					<h3 class="instructionHeaderPage">Built with</h3>
+					<p>HTML5, CSS and JavaScript, plus these open-source libraries, each used under an open-source licence (MIT unless stated):</p>
+					<ul>
+						<li><a href="https://getbootstrap.com/">Bootstrap</a> 4.3.1, for layout and styling</li>
+						<li><a href="https://jquery.com/">jQuery</a> 3.4.1</li>
+						<li><a href="https://clipboardjs.com/">clipboard.js</a> 2.0.4, for copying text</li>
+						<li><a href="https://github.com/mathiasbynens/he">he</a> 1.2.0, for escaping HTML entities</li>
+						<li><a href="https://stuk.github.io/jszip/">JSZip</a> 3.10.1, for creating Word files (Advanced page; MIT or GPL-3.0 licence)</li>
+					</ul>
+
+					<h3 class="instructionHeaderPage">Accessibility</h3>
+					<p>The pages are designed to work with a keyboard and screen reader, to have high-contrast text in both light and dark modes, and to follow the Web Content Accessibility Guidelines (WCAG).  They have been checked with automated accessibility testing, which cannot catch everything.  If you find something that is hard to use, please <a href="mailto:lynsay.shepherd@abertay.ac.uk?Subject=%5BAccessibility%5D%20Jotter%20Notarum%3A%20Feedback%20Generator">let me know</a>.</p>
+
+					<h3 class="instructionHeaderPage">Privacy</h3>
+					<p>Nothing you enter is sent anywhere.  Read the <a href="privacy.html">privacy page</a> for details.</p>
+				</div>
+			</div>
+		</main>
+		<footer class="container-fluid"><p class="site-footer">Written by Dr Lynsay Shepherd in 2019 &middot; Updated in 2026</p></footer>
+
+		<script src="js/nav.js"></script>
+</body>
+</html>

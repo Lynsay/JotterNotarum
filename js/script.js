@@ -14,9 +14,6 @@ $( document ).ready(function() {
     //enable the option to copy the text
     setupClipboard();
 
-    //light / dark theme switch
-    setupThemeToggle();
-
     //Generate feedback- call function onclick
     $( "#generate" ).click(function() {
         try {
@@ -87,21 +84,6 @@ function flashStatus(selector, message, isError){
         .animate({opacity:0}, 800, function(){
             $(this).text("").removeClass("status-ok status-error").css("opacity", 1);
         });
-}
-
-//dark mode: theme is set on <html data-theme> (initial value set by a tiny script in <head>), choice is remembered
-function setupThemeToggle(){
-    var $btn = $("#themeToggle");
-    function sync(){
-        $btn.attr("aria-pressed", document.documentElement.getAttribute("data-theme") === "dark");
-    }
-    sync();
-    $btn.click(function(){
-        var next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
-        document.documentElement.setAttribute("data-theme", next);
-        try { localStorage.setItem("theme", next); } catch(e) { /* storage unavailable: still works for this visit */ }
-        sync();
-    });
 }
 
 //Copying: put the feedback on the clipboard as plain text AND as HTML.  Rich-text editors (like the one in

@@ -132,6 +132,9 @@ p a, li a { text-decoration: underline; text-underline-offset: 2px; }
 .brand-sub { font-weight: 500; }
 
 #mainHeaderText {
+    margin: 0;
+    line-height: 1.25;
+    font-weight: 400;
     font-size: clamp(1.75rem, 3vw + 1rem, 2.5rem);
     font-weight: 750;
     letter-spacing: -0.03em;
@@ -143,8 +146,6 @@ p a, li a { text-decoration: underline; text-underline-offset: 2px; }
     color: transparent;
 }
 
-.header-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
-#instructLink { font-size: .95rem; margin: 0; }
 
 .theme-toggle {
     display: inline-flex;
@@ -185,33 +186,6 @@ p a, li a { text-decoration: underline; text-underline-offset: 2px; }
 }
 .theme-toggle[aria-pressed="true"] .track { background: var(--accent); border-color: var(--accent-text); }
 .theme-toggle[aria-pressed="true"] .track::after { transform: translateX(1rem); background: #fff; }
-
-#instructLink a {
-    display: inline-flex;
-    align-items: center;
-    gap: .4rem;
-    padding: .3rem .8rem .3rem .55rem;
-    border-radius: 999px;
-    background: var(--card);
-    border: 1px solid var(--line);
-    font-weight: 500;
-    box-shadow: 0 1px 2px rgba(17, 24, 39, .04);
-    transition: border-color .15s, box-shadow .15s, transform .15s;
-}
-
-#instructLink a:hover {
-    text-decoration: none;
-    border-color: var(--hover-border);
-    box-shadow: 0 4px 12px rgba(79, 70, 229, .12);
-    transform: translateY(-1px);
-}
-
-.link-icon {
-    flex: none;
-    width: 18px;
-    height: 18px;
-    color: var(--accent-text);
-}
 
 /* ---------- logo ---------- */
 .site-header {
@@ -435,9 +409,9 @@ label.btn.btn-primary { cursor: pointer; margin: 0; position: relative; }
 
 /* ---------- instructions page ---------- */
 .instructionHeaderPage { margin-bottom: .75rem; letter-spacing: -0.01em; }
-h5.instructionHeaderPage { margin-top: 2rem; font-weight: 650; }
-h4.instructionHeaderPage { margin-top: 2.5rem; font-weight: 700; }
-h4.instructionHeaderPage:first-child { margin-top: 0; }
+h3.instructionHeaderPage { margin-top: 2rem; font-size: 1.25rem; font-weight: 650; }
+h2.instructionHeaderPage { margin-top: 2.5rem; font-size: 1.5rem; font-weight: 700; }
+h2.instructionHeaderPage:first-child { margin-top: 0; }
 
 .instructionImages {
     width: 100%;
@@ -485,3 +459,134 @@ h4.instructionHeaderPage:first-child { margin-top: 0; }
 }
 
 .roundedCornerDivInstruct { margin-left: auto; margin-right: auto; }
+
+
+/* ---------- top navigation ---------- */
+.skip-link {
+    position: absolute;
+    left: .75rem;
+    top: -4rem;
+    z-index: 1000;
+    padding: .6rem 1rem;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+}
+.skip-link:focus { top: .75rem; color: #fff; text-decoration: none; }
+main:focus { outline: none; }
+
+.site-top {
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 1px 2px rgba(17, 24, 39, .04);
+}
+
+.site-nav {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: .6rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.nav-links {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.nav-links a,
+.nav-links a:hover {
+    display: block;
+    padding: .45rem .95rem;
+    border: 2px solid transparent;
+    border-radius: 999px;
+    color: var(--ink);
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color .15s, border-color .15s;
+}
+.nav-links a:hover { background: var(--row-hover); border-color: var(--hover-border); }
+.nav-links a[aria-current="page"],
+.nav-links a[aria-current="page"]:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 650;
+}
+
+.nav-toggle {
+    display: none;
+    padding: .3rem .95rem;
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--ink);
+    border: 1px solid var(--control-border);
+    font-size: .95rem;
+    font-weight: 600;
+    line-height: 1.5;
+    cursor: pointer;
+}
+.nav-toggle:hover { border-color: var(--accent-text); }
+.nav-toggle::after { content: "\25BE"; margin-left: .4rem; }
+.nav-toggle[aria-expanded="true"]::after { content: "\25B4"; }
+
+@media (max-width: 767.98px) {
+    .site-nav { flex-wrap: wrap; padding: .6rem 1rem; }
+    .js .nav-toggle { display: inline-flex; align-items: center; }
+    .js .nav-links { display: none; order: 3; flex: 1 0 100%; flex-direction: column; gap: .15rem; padding-top: .4rem; }
+    .js .nav-links.open { display: flex; }
+    .nav-links a { padding: .65rem 1rem; }
+    .theme-toggle { margin-left: auto; }
+    .nav-links { order: 3; flex: 1 0 100%; }
+}
+
+/* ---------- content pages (Advanced, Privacy, About, Instructions) ---------- */
+.roundedCornerDivInstruct ul { padding-left: 1.4rem; margin-bottom: 1rem; }
+.roundedCornerDivInstruct li { margin-bottom: .5rem; }
+.roundedCornerDivInstruct code,
+.roundedCornerDivInstruct kbd {
+    padding: .1em .4em;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--well);
+    color: var(--ink);
+    font-size: .9em;
+}
+
+@media (forced-colors: active) {
+    .nav-links a[aria-current="page"] { border-color: CanvasText; }
+    .skip-link { border: 2px solid CanvasText; }
+}
+
+
+/* ---------- Advanced page: export to Word ---------- */
+.export-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem 2.5rem; }
+.export-block p { margin-bottom: .75rem; }
+.export-subheading { font-size: 1.05rem; font-weight: 650; margin: .5rem 0 .75rem; letter-spacing: -0.01em; }
+.export-label { font-weight: 600; color: var(--ink) !important; margin-top: 1.25rem; }
+.export-hint { font-size: .9rem; color: var(--ink-soft); }
+.roundedCornerDiv label { font-weight: 600; margin-bottom: .25rem; }
+.roundedCornerDiv label.btn { font-weight: 500; margin-bottom: 0; }
+.export-check { display: flex; align-items: flex-start; gap: .6rem; font-weight: 500 !important; }
+.export-check input { margin-top: .2rem; flex: none; }
+#studentName {
+    width: 100%;
+    max-width: 26rem;
+    background: var(--field-bg);
+    color: var(--ink);
+    border: 1px solid var(--control-border);
+    border-radius: 10px;
+}
+#studentName:focus { border-color: var(--accent-text); box-shadow: 0 0 0 3px var(--accent-text); }
+#exportCard [hidden] { display: none !important; }
+
+@media (max-width: 767.98px) {
+    .export-grid { grid-template-columns: 1fr; }
+}
