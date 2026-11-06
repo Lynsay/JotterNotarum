@@ -237,7 +237,7 @@ function renderFeedbackList(focusId){
         if (entry.type === "heading") {
             if (openHeading) { addCommentRow(openHeading); }        //close off the previous section
             openHeading = entry;
-            $list.append($("<li></li>").append($("<h5 class='listSectionHeader'></h5>").text(entry.text)));
+            $list.append($("<li></li>").append($("<h3 class='listSectionHeader'></h3>").text(entry.text)));
         }
         else if (entry.type === "break") {
             if (openHeading) { addCommentRow(openHeading); openHeading = null; }

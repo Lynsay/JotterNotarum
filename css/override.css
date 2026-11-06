@@ -321,7 +321,7 @@ label.btn.btn-primary { cursor: pointer; margin: 0; position: relative; }
     text-align: center;
 }
 
-#checkboxList li:not(:has(h5)):not(.add-comment) {
+#checkboxList li:not(:has(.listSectionHeader)):not(.add-comment) {
     display: flex;
     align-items: flex-start;
     gap: .75rem;
@@ -330,7 +330,7 @@ label.btn.btn-primary { cursor: pointer; margin: 0; position: relative; }
     border-radius: 10px;
     transition: background-color .12s;
 }
-#checkboxList li:not(:has(h5)):not(.add-comment):hover { background: var(--row-hover); }
+#checkboxList li:not(:has(.listSectionHeader)):not(.add-comment):hover { background: var(--row-hover); }
 #checkboxList li:has(input:checked) { background: var(--accent-soft) !important; }
 
 .listSectionHeader {
@@ -572,21 +572,69 @@ main:focus { outline: none; }
 .export-subheading { font-size: 1.05rem; font-weight: 650; margin: .5rem 0 .75rem; letter-spacing: -0.01em; }
 .export-label { font-weight: 600; color: var(--ink) !important; margin-top: 1.25rem; }
 .export-hint { font-size: .9rem; color: var(--ink-soft); }
-.roundedCornerDiv label { font-weight: 600; margin-bottom: .25rem; }
-.roundedCornerDiv label.btn { font-weight: 500; margin-bottom: 0; }
 .export-check { display: flex; align-items: flex-start; gap: .6rem; font-weight: 500 !important; }
 .export-check input { margin-top: .2rem; flex: none; }
-#studentName {
-    width: 100%;
-    max-width: 26rem;
-    background: var(--field-bg);
-    color: var(--ink);
-    border: 1px solid var(--control-border);
-    border-radius: 10px;
-}
-#studentName:focus { border-color: var(--accent-text); box-shadow: 0 0 0 3px var(--accent-text); }
 #exportCard [hidden] { display: none !important; }
 
 @media (max-width: 767.98px) {
     .export-grid { grid-template-columns: 1fr; }
 }
+
+/* ---------- Advanced page: student list (shows 5 names, scrolls for more) ---------- */
+.student-fieldset { margin: 0 0 1rem; padding: 0; border: 0; min-width: 0; }
+.student-box {
+    --student-row: 2.75rem;
+    position: relative;
+    max-height: calc(var(--student-row) * 5 + 2px);
+    overflow-y: auto;
+    border: 1px solid var(--control-border);
+    border-radius: 12px;
+    background: var(--field-bg);
+}
+.student-box .student-row { display: block; margin: 0; }
+.student-box .student-row span {
+    display: flex;
+    align-items: center;
+    height: var(--student-row);
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+    font-weight: 500;
+    cursor: pointer;
+}
+.student-box .student-row:last-child span { border-bottom: 0; }
+.student-box .student-row span:hover { background: var(--row-hover); }
+.student-box .student-row input:checked + span { background: var(--accent); color: #fff; font-weight: 650; }
+.student-box .student-row input:checked + span::after { content: "\2713"; margin-left: auto; padding-left: 1rem; }
+.student-box .student-row input:focus-visible + span { outline: 3px solid var(--accent-text); outline-offset: -3px; }
+.student-box:empty {
+    display: grid;
+    place-items: center;
+    height: calc(var(--student-row) * 5 + 2px);
+    border: 2px dashed var(--control-border);
+    background: var(--well);
+}
+.student-box:empty::before {
+    content: "Your students will appear here once you load a list.";
+    color: var(--ink-soft);
+    font-size: .95rem;
+    padding: 1rem;
+    text-align: center;
+}
+@media (forced-colors: active) {
+    .student-box .student-row input:checked + span { outline: 2px solid Highlight; outline-offset: -2px; }
+}
+
+/* ---------- Advanced page: steps 1-3 in the left column, steps 4-5 in the right ---------- */
+.adv-columns {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+.adv-col { min-width: 0; }
+@media (min-width: 768px) {
+    .adv-columns { flex-direction: row; align-items: flex-start; gap: 1.5rem; }
+    .adv-col { flex: 1 1 0; }
+}
+/* the Word options are narrower now they sit in a half-width column, so stack them */
+.adv-col .export-grid { grid-template-columns: 1fr; gap: .25rem; }

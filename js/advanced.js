@@ -1,7 +1,7 @@
 /*
     Desc: Extra options for the Advanced page.  Once feedback has been generated it can be exported as a Word
           (.docx) file on the user's own computer: one file per student, or appended to a single combined file.
-          Student names can be typed, or picked from a class list loaded from a text file.
+          Student names come from a list loaded from a text file and shown in a small scrollable box.
 
           Everything happens in the browser: nothing is uploaded, and the class list is kept in memory only.
           Relies on script.js (flashStatus, clearPage, feedbackToPlainText) and on JSZip (js/jszip.min.js).
@@ -54,7 +54,8 @@
     //a brand-new, minimal Word document (A4, Calibri 11)
     function newDocZip(bodyXml) {
         var zip = new JSZip();
-        zip.file("[Content_Types].xml",
+        var add = function (path, data) { zip.file(path, data, { createFolders: false }); };   //no separate folder entries: Word is fussy about them
+        add("[Content_Types].xml",
             '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
             '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
             '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
@@ -62,23 +63,23 @@
             '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>' +
             '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>' +
             "</Types>");
-        zip.file("_rels/.rels",
+        add("_rels/.rels",
             '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
             '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
             '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>' +
             "</Relationships>");
-        zip.file("word/_rels/document.xml.rels",
+        add("word/_rels/document.xml.rels",
             '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
             '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
             '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>' +
             "</Relationships>");
-        zip.file("word/styles.xml",
+        add("word/styles.xml",
             '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
             '<w:styles xmlns:w="' + W_NS + '"><w:docDefaults><w:rPrDefault><w:rPr>' +
             '<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:eastAsia="Calibri" w:cs="Calibri"/><w:sz w:val="22"/><w:szCs w:val="22"/><w:lang w:val="en-GB"/>' +
             '</w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="160" w:line="276" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>' +
             '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style></w:styles>');
-        zip.file("word/document.xml",
+        add("word/document.xml",
             '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
             '<w:document xmlns:w="' + W_NS + '"><w:body>' + (bodyXml || "") +
             '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr>' +
@@ -103,7 +104,7 @@
 
         //start each student after the first on a new page (an empty document doesn't need a page break)
         var hasContent = /<w:t[\s>]|<w:tbl[\s>]|<w:drawing|<w:pict/.test(xml.slice(bodyStart, at));
-        zip.file("word/document.xml", xml.slice(0, at) + entryXml(name, feedback, hasContent) + xml.slice(at));
+        zip.file("word/document.xml", xml.slice(0, at) + entryXml(name, feedback, hasContent) + xml.slice(at), { createFolders: false });
         return zip;
     }
 
@@ -152,8 +153,9 @@
 
     /* ---------- reading the page ---------- */
 
+    //the name selected in the student list ("" if no list has been loaded)
     function studentName() {
-        return $.trim($("#studentName").val()).replace(/\s+/g, " ");
+        return $("#studentBox input:checked").val() || "";
     }
 
     //the feedback to export, or null (after telling the user) if there isn't any yet
@@ -185,11 +187,9 @@
                 var handle = await window.showSaveFilePicker({ suggestedName: filename, types: docxPickerTypes() });
                 await writeHandle(handle, blob);
                 exportMessage("Saved " + handle.name, false);
-                afterExport(name, "Saved " + handle.name);
             } else {
                 download(blob, filename);
                 exportMessage("Downloaded " + filename, false);
-                afterExport(name, "Downloaded " + filename);
             }
         } catch (e) {
             if (isAbort(e)) { return; }                     //the user closed the save dialog
@@ -262,8 +262,7 @@
         if (feedback === null) { return; }
         var name = studentName();
         if (!name) {
-            exportMessage("Enter the student's name first", true);
-            $("#studentName").focus();
+            exportMessage("Load a student list and select a student first (Step 1)", true);
             return;
         }
         if (!combined.handle && !combined.zip) {
@@ -286,9 +285,7 @@
                 download(blob, combined.name);
             }
             combined.added++;
-            var done = "Added " + name + " to " + combined.name + " (" + combined.added + " this session)";
-            exportMessage(done, false);
-            afterExport(name, done);
+            exportMessage("Added " + name + " to " + combined.name + " (" + combined.added + " this session)", false);
         } catch (e) {
             if (e && e.message === "not-word") {
                 exportMessage("That file doesn't look like a Word document I can add to", true);
@@ -302,7 +299,7 @@
 
     /* ---------- student names ---------- */
 
-    //read a class list: one name per line
+    //read a student list: one name per line
     function parseClassList(text) {
         var seen = {}, names = [];
         text.replace(/^﻿/, "").split(/\r?\n/).forEach(function (line) {
@@ -312,12 +309,42 @@
         return names;
     }
 
+    //show the selected student's name in the export section
+    function showSelectedStudent() {
+        $(".selected-student").text(studentName() || "none selected");
+    }
+
+    //keep the selected row inside the 5-row scrolling box
+    function scrollToSelected() {
+        var box = document.getElementById("studentBox");
+        var input = box.querySelector("input:checked");
+        if (!input) { return; }
+        var row = input.parentNode;
+        if (row.offsetTop < box.scrollTop) { box.scrollTop = row.offsetTop; }
+        else if (row.offsetTop + row.offsetHeight > box.scrollTop + box.clientHeight) {
+            box.scrollTop = row.offsetTop + row.offsetHeight - box.clientHeight;
+        }
+    }
+
+    function selectStudent(input) {
+        input.checked = true;
+        showSelectedStudent();
+        scrollToSelected();
+    }
+
+    //draw the list as a group of radio buttons (native keyboard use: arrow keys move through the names)
     function setClassList(names) {
         classList = names;
-        var $list = $("#studentList").empty();
-        names.forEach(function (name) { $list.append($("<option></option>").attr("value", name)); });
+        var $box = $("#studentBox").empty();
+        names.forEach(function (name) {
+            var $label = $("<label class='student-row'></label>");
+            $label.append($("<input type='radio' name='student' class='sr-only-input'>").val(name));
+            $label.append($("<span></span>").text(name));
+            $box.append($label);
+        });
         $("#nextOption").prop("hidden", !names.length);
-        if (!names.length) { $("#autoNext").prop("checked", false); }
+        if (names.length) { selectStudent($box.find("input")[0]); }
+        showSelectedStudent();
     }
 
     function setupClassList() {
@@ -329,29 +356,38 @@
                 var names = parseClassList(await file.text());
                 if (!names.length) { throw new Error("empty"); }
                 setClassList(names);
-                if (!studentName()) { $("#studentName").val(names[0]); }
                 flashStatus("#classListStatus", names.length + " student" + (names.length === 1 ? "" : "s") + " loaded", false);
             } catch (e) {
                 flashStatus("#classListStatus", "Could not read any names from that file", true);
             }
         });
+
+        $("#studentBox").on("change", "input", function () {
+            showSelectedStudent();
+            scrollToSelected();
+        });
     }
 
-    //after an export: if asked to, clear the page and move on to the next name in the class list
-    function afterExport(name, doneMessage) {
-        if (!$("#autoNext").prop("checked") || !classList.length) { return; }
-        var i = classList.indexOf(name);
-        var next = i >= 0 ? classList[i + 1] : undefined;
-        clearPage();
-        $("#studentName").val(next || "");
-        flashStatus("#exportStatus", next ? doneMessage + ".  Next student: " + next
-                                          : doneMessage + ".  That was the end of the class list", false);
+    //"Clear feedback" (handled by script.js) also moves on to the next student, if the box is ticked
+    function setupClearNext() {
+        $("#clearFeedback").on("click", function () {
+            if (!$("#autoNext").prop("checked") || !classList.length) { return; }
+            var inputs = $("#studentBox input").toArray();
+            var i = inputs.findIndex(function (el) { return el.checked; });
+            if (i >= 0 && i + 1 < inputs.length) {
+                selectStudent(inputs[i + 1]);
+                flashStatus("#exportStatus", "Next student: " + inputs[i + 1].value, false);
+            } else if (i >= 0) {
+                flashStatus("#exportStatus", "That was the last student in your list", false);
+            }
+        });
     }
 
     /* ---------- wiring ---------- */
 
     $(function () {
         setupClassList();
+        setupClearNext();
         setupCombinedFallback();
         showCombined();
 
