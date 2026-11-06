@@ -1,0 +1,123 @@
+<!--
+	Desc: Core HTML for the student feedback generator.
+	
+    Author: Lynsay A. Shepherd
+
+    Date: October 2019
+
+-->
+
+<!doctype html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<script>/* set theme before first paint to avoid a flash */
+	(function(){try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+	<meta name="color-scheme" content="light dark">
+	<title>Jotter Notarum: Feedback Generator</title>
+	<script src="js/jquery-3.4.1.min.js"></script>
+	<link rel="icon" type="image/svg+xml" href="gfx/favicon.svg">
+	<link rel="icon" type="image/png" sizes="32x32" href="gfx/favicon-32.png">
+	<link rel="icon" type="image/png" sizes="64x64" href="gfx/favicon-64.png">
+	<link rel="apple-touch-icon" href="gfx/apple-touch-icon.png">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/he.js"></script>
+	<link rel="stylesheet" href="css/override.css">
+</head>
+<body>
+		<div class="container-fluid">
+
+				<div class="row ">
+						<div class="col-md-12 form-group site-header">
+							<svg class="site-logo" viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <defs>
+    <!-- knocks the pencil's silhouette out of the notepad so the lines don't show through it -->
+    <mask id="logo-gap" maskUnits="userSpaceOnUse" x="0" y="0" width="120" height="120">
+      <rect width="120" height="120" fill="#fff"/>
+      <g transform="translate(47 103) rotate(135)" stroke="#000" stroke-width="11" fill="#000">
+        <path d="M0 0 L-16 -8 L-62 -8 L-62 8 L-16 8 Z"/>
+      </g>
+    </mask>
+  </defs>
+  <g mask="url(#logo-gap)">
+    <!-- pad -->
+    <rect x="20" y="22" width="64" height="82" rx="9"/>
+    <!-- spiral binding -->
+    <path d="M34 14v16M48 14v16M62 14v16M76 14v16"/>
+    <!-- written lines + tick -->
+    <path d="M32 48l5 5 9-10"/>
+    <path d="M54 47h20M32 66h42M32 82h26"/>
+  </g>
+  <!-- pencil -->
+  <g transform="translate(47 103) rotate(135)">
+    <path d="M0 0 L-16 -8 L-16 8 Z"/>               <!-- tip -->
+    <path d="M-16 -8 H-62 V8 H-16"/>                <!-- body -->
+    <path d="M-50 -8 V8"/>                          <!-- ferrule -->
+  </g>
+</svg>
+							<div class="site-header-text">
+							<p id="mainHeaderText"><span class="brand-name">Jotter Notarum</span><span class="brand-sub">: Feedback Generator</span></p>
+							<div class="header-actions">
+							<p id="instructLink"><a href="instructions.html"><svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 6.5C10.4 5.3 8.2 4.7 5 4.7v12.6c3.2 0 5.4.6 7 1.8 1.6-1.2 3.8-1.8 7-1.8V4.7c-3.2 0-5.4.6-7 1.8z"/><path d="M12 6.5v12.6"/></svg>Click here to view instructions</a></p>
+							<button type="button" id="themeToggle" class="theme-toggle" aria-pressed="false"><span class="track" aria-hidden="true"></span>Dark mode</button>
+						</div>
+							</div>
+						
+						</div>
+					</div>
+
+
+			
+			
+			<div class="row ">
+					<div class="col-md-12 form-group roundedCornerDiv" ><!--for file selection-->
+						<h4 class="instructionHeader"><span class="step-badge">1</span><span>Select your feedback comments file</span></h4>
+						<p>This must be a .txt file formatted according to the instructions.</p>
+						<p><label class="btn btn-primary">
+							Browse<input type="file" accept=".txt" class="sr-only-input" name="file" id="fileSelector">
+						</label> <span id="fadeFileText" role="status" aria-live="polite"></span></p>
+					</div>
+			</div>
+			
+
+			<div class="row">
+		
+				<div class="col-md-6 form-group roundedCornerDiv"><!--for checkboxes-->
+					<h4 class="instructionHeader"><span class="step-badge">2</span><span>Select your feedback phrases</span></h4>
+					<ul id="checkboxList"></ul><!--populated by JavaScript-->
+					<p class="list-status"><button type="button" id="saveFile" class="btn btn-primary" hidden>Save updated file</button> <span id="fadeListText" role="status" aria-live="polite"></span></p>
+					<button class="btn btn-secondary scrollup scrollButton">Scroll To Top</button>
+				</div>
+
+				<div class="col-md-6 form-group roundedCornerDiv">
+					<h4 class="instructionHeader"><span class="step-badge">3</span><span>Generate feedback text</span></h4>
+					<p>Click the button below to generate feedback text.  You can also add your own text to the generated comments.</p>
+					<p><button id="generate" class="btn btn-primary">Generate Feedback</button> <span id="fadeGenerateText" role="status" aria-live="polite"></span></p>
+
+					<textarea id="feedbackText" aria-label="Generated feedback text" class="form-control" rows="14"></textarea>
+
+					<hr class="step-divider" />
+					<h4 class="instructionHeader"><span class="step-badge">4</span><span>Copy feedback and clear page</span></h4>
+					<p>Copy the feedback and paste it into My Learning Space.  Alternatively, reset the page to its original state.</p>
+					<p><button id="copyToClipboard" class="btn btn-primary" data-clipboard-action="copy" data-clipboard-target="#feedbackText">Copy Feedback</button>
+					<button id="clearFeedback" class="btn btn-secondary">Clear Page</button> <span id="fadeCopyClearText" role="status" aria-live="polite"></span></p>
+					<br />
+					<button class="btn btn-secondary scrollup scrollButton">Scroll To Top</button>
+				</div>
+
+				<!--script at the bottom-->
+				<script src="js/script.js"></script>
+			</div><!--close row-->
+
+			<footer class="site-footer">Written by Dr Lynsay Shepherd in 2019 &middot; Updated in 2026</footer>
+		</div><!--close container-->
+</body>
+</html>
+
+
+

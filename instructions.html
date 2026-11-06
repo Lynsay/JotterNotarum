@@ -1,0 +1,128 @@
+<!--
+	Desc: Instructions for the student feedback generator.
+	
+    Author: Lynsay A. Shepherd
+
+    Date: October 2019
+
+-->
+
+<!doctype html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script>/* set theme before first paint to avoid a flash */
+	(function(){try{var t=localStorage.getItem('theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+	<meta name="color-scheme" content="light dark">
+	<title>Instructions for Jotter Notarum: Feedback Generator</title>
+	<script src="js/jquery-3.4.1.min.js"></script>
+	<link rel="icon" type="image/svg+xml" href="gfx/favicon.svg">
+	<link rel="icon" type="image/png" sizes="32x32" href="gfx/favicon-32.png">
+	<link rel="icon" type="image/png" sizes="64x64" href="gfx/favicon-64.png">
+	<link rel="apple-touch-icon" href="gfx/apple-touch-icon.png">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/clipboard.min.js"></script>
+	<script src="js/he.js"></script>
+	<link rel="stylesheet" href="css/override.css">
+</head>
+<body>
+		<div class="container-fluid">
+
+				<div class="row ">
+						<div class="col-md-12 form-group site-header">
+							<svg class="site-logo" viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  <defs>
+    <!-- knocks the pencil's silhouette out of the notepad so the lines don't show through it -->
+    <mask id="logo-gap" maskUnits="userSpaceOnUse" x="0" y="0" width="120" height="120">
+      <rect width="120" height="120" fill="#fff"/>
+      <g transform="translate(47 103) rotate(135)" stroke="#000" stroke-width="11" fill="#000">
+        <path d="M0 0 L-16 -8 L-62 -8 L-62 8 L-16 8 Z"/>
+      </g>
+    </mask>
+  </defs>
+  <g mask="url(#logo-gap)">
+    <!-- pad -->
+    <rect x="20" y="22" width="64" height="82" rx="9"/>
+    <!-- spiral binding -->
+    <path d="M34 14v16M48 14v16M62 14v16M76 14v16"/>
+    <!-- written lines + tick -->
+    <path d="M32 48l5 5 9-10"/>
+    <path d="M54 47h20M32 66h42M32 82h26"/>
+  </g>
+  <!-- pencil -->
+  <g transform="translate(47 103) rotate(135)">
+    <path d="M0 0 L-16 -8 L-16 8 Z"/>               <!-- tip -->
+    <path d="M-16 -8 H-62 V8 H-16"/>                <!-- body -->
+    <path d="M-50 -8 V8"/>                          <!-- ferrule -->
+  </g>
+</svg>
+							<div class="site-header-text">
+							<p id="mainHeaderText"><span class="brand-name">Jotter Notarum</span><span class="brand-sub">: Feedback Generator</span><span class="brand-sub"> - Instructions</span></p>
+							<div class="header-actions">
+							<p id="instructLink"><a href="index.html"><svg class="link-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M19 12H5"/><path d="M11 6l-6 6 6 6"/></svg>Back to Jotter Notarum</a></p>
+							<button type="button" id="themeToggle" class="theme-toggle" aria-pressed="false"><span class="track" aria-hidden="true"></span>Dark mode</button>
+						</div>
+							</div>
+						
+						</div>
+					</div>
+			
+			<div class="row ">
+					<div class="col-md-12 form-group roundedCornerDivInstruct">
+						<!--Using the system-->
+						<h4 class="instructionHeaderPage">Using the system</h4>
+						<p>Below are the instructions for using Jotter Notarum, the student feedback generator.</p>
+						<br />
+
+						<h5 class="instructionHeaderPage">Step 1: Select your feedback comments file</h5>
+							<p>You need to select a .txt file to load into Jotter Notarum.  This file should contain your commonly used comments.  Hit "Browse" to select a file.</p>
+							<img class="img-fluid img-thumbnail instructionImages mx-auto d-block" src="gfx/stepOne.png" alt="step one image" />
+
+							<p>Your feedback .txt file must be formatted in a specific way.  Section headings must start with a <b>#</b>.  The end of a section is denoted by a new line containing a <b>*</b>.  Blank lines will be ignored.  Ensure each line of feedback ends with a fullstop.  To help you, a <a href="feedback.txt" target="_blank">sample feedback file</a> has been provided.</p>
+
+							<img class="img-fluid img-thumbnail instructionImages mx-auto d-block" src="gfx/feedbackEx.png" alt="feedback example image" />
+						
+
+
+						<h5 class="instructionHeaderPage">Step 2: Select your feedback phrases</h5>
+						<p>Select all the required pieces of feedback you wish to use for a particular student.  You also have the option to split the feedback into paragraphs by checking the relevant "<i>Insert line break in feedback text</i>" checkboxes.</p>
+						<p>To add a new comment to a section, choose "<i>+ Add a comment to this section</i>", type the comment and press "Add".  The comment is added to the end of that section and saved to your feedback file.  In Chrome and Edge your browser will ask permission to edit the file the first time, and the file is updated automatically.  In other browsers, press the "Save updated file" button that appears and replace your old feedback file with the downloaded one.</p>
+						<img class="img-fluid img-thumbnail instructionImages mx-auto d-block" src="gfx/stepTwo.png" alt="step two image" />
+
+						
+						<h5 class="instructionHeaderPage">Step 3: Generate feedback text</h5>
+						<p>To generate the paragraph(s) of selected feedback, press the "Generate Feedback" button.  The text content of the selected checkboxes will appear in the text area below the button.</p>
+						<img class="img-fluid img-thumbnail instructionImages mx-auto d-block" src="gfx/stepThree.png" alt="step three image" />
+
+						
+						<h5 class="instructionHeaderPage">Step 4: Copy feedback and clear page</h5>
+						<p>Click the "Copy Feedback" button to copy the contents of the text area to your clipboard.  You will now be able to paste the feedback into My Learning Space.</p>
+						<p>Once you have copied the feedback for a student, click "Clear Page" to reset the checkboxes and text area.  You can now move on to selecting feedback for a different student. </p>
+						<img class="img-fluid img-thumbnail instructionImages mx-auto d-block" src="gfx/stepFour.png" alt="step four image" />
+
+
+						<h4 class="instructionHeaderPage">About the system</h4>
+						<p>Built using HTML5, CSS (libraries/frameworks: Bootstrap), JavaScript (libraries/frameworks: he.js for escaping HTML entities, clipboard.js for copying text, jQuery).  Written by <a href="https://www.abertay.ac.uk/staff-search/dr-lynsay-shepherd/">Lynsay Shepherd</a>, October 2019.  Any issues contact <a href="mailto:lynsay.shepherd@abertay.ac.uk?Subject=&#91;Issue&#93;%20Jotter%20Notarum%3A%20Feedback%20Generator">lynsay.shepherd@abertay.ac.uk</a></p>
+					
+
+						<br />
+						<button class="btn btn-secondary scrollup scrollButton">Scroll To Top</button>
+
+					</div>
+			</div>
+			
+
+				<footer class="site-footer">Written by Dr Lynsay Shepherd in 2019 &middot; Updated in 2026</footer>
+
+				<!--script at the bottom-->
+				<script src="js/script.js"></script>
+			</div><!--close row-->
+		</div><!--close container-->
+</body>
+</html>
+
+
+

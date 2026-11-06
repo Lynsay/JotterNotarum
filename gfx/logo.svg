@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" fill="none" stroke="#4338ca" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Notepad and pencil">
+  <defs>
+    <!-- knocks the pencil's silhouette out of the notepad so the lines don't show through it -->
+    <mask id="logo-gap" maskUnits="userSpaceOnUse" x="0" y="0" width="120" height="120">
+      <rect width="120" height="120" fill="#fff"/>
+      <g transform="translate(47 103) rotate(135)" stroke="#000" stroke-width="11" fill="#000">
+        <path d="M0 0 L-16 -8 L-62 -8 L-62 8 L-16 8 Z"/>
+      </g>
+    </mask>
+  </defs>
+  <g mask="url(#logo-gap)">
+    <!-- pad -->
+    <rect x="20" y="22" width="64" height="82" rx="9"/>
+    <!-- spiral binding -->
+    <path d="M34 14v16M48 14v16M62 14v16M76 14v16"/>
+    <!-- written lines + tick -->
+    <path d="M32 48l5 5 9-10"/>
+    <path d="M54 47h20M32 66h42M32 82h26"/>
+  </g>
+  <!-- pencil -->
+  <g transform="translate(47 103) rotate(135)">
+    <path d="M0 0 L-16 -8 L-16 8 Z"/>               <!-- tip -->
+    <path d="M-16 -8 H-62 V8 H-16"/>                <!-- body -->
+    <path d="M-50 -8 V8"/>                          <!-- ferrule -->
+  </g>
+</svg>
