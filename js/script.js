@@ -64,6 +64,12 @@ $( document ).ready(function() {
         scrollPage();
     });
 
+    //modifiers, editing / deleting comments, word count
+    setupModifiers();
+    setupEditComments();
+    setupAddSections();
+    setupWordCount();
+
 });//close document.ready
 
 
@@ -140,12 +146,35 @@ function setupClipboard(){
 
 //generate the feedback from the selected checkboxes.
 function generateFeedback(){
-    //check if boxes are selected
-    var fullText="";
+    var fullText = "";
+    var $unresolved = $();
+
     $('input[name="feedback"]:checked').each(function() {
-        fullText=fullText + this.value;
+        var entry = this.getAttribute("data-entry") ? entryById(parseInt(this.getAttribute("data-entry"), 10)) : null;
+        if (entry && entryHasModifiers(entry)) {
+            var value = phraseValue(entry);
+            if (value === null) {
+                $unresolved = $unresolved.add($('select.modifier[data-entry="' + entry.id + '"]').filter(function(){ return this.value === ""; }));
+            } else {
+                fullText += value;
+            }
+        } else {
+            fullText += this.value;
+        }
     });
+
+    //a ticked comment still has a choice to make (e.g. [excellent, good]): don't guess, point to it
+    if ($unresolved.length) {
+        $("select.modifier").removeClass("needs-choice").removeAttr("aria-invalid");
+        $unresolved.addClass("needs-choice").attr("aria-invalid", "true");
+        flashStatus("#fadeGenerateText", "Choose an option for the highlighted comment" + ($unresolved.length > 1 ? "s" : "") + " first", true);
+        $unresolved.first().focus();
+        return;
+    }
+
+    $("select.modifier").removeClass("needs-choice").removeAttr("aria-invalid");
     $('#feedbackText').val(fullText);
+    updateWordCount();
 
     flashStatus("#fadeGenerateText", "Feedback generated", false);
 }
@@ -159,13 +188,102 @@ function generateFeedbackError(){
 
 //clear the page and start again
 function clearPage(){
-    //location.reload(true);
     $('input[name="feedback"]').each(function() 
     { 
             this.checked = false; 
     }); 
+    modChoice = {};
+    $("select.modifier").val("").removeClass("needs-choice").removeAttr("aria-invalid");
     $('#feedbackText').val('');
+    updateWordCount();
     scrollPage();
+}
+
+
+/*
+    Word count
+*/
+function countWords(text){
+    return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+function updateWordCount(){
+    var n = countWords($("#feedbackText").val() || "");
+    $("#wordCount").text(n + (n === 1 ? " word" : " words"));
+}
+
+function setupWordCount(){
+    $("#feedbackText").on("input", updateWordCount);
+    updateWordCount();
+}
+
+
+/*
+    Modifiers.  A comment can hold choices such as  [excellent, very good, good]  (or [a|b, c|d] when an
+    option needs a comma in it).  The file keeps the comment exactly as typed; the choice is made in the
+    list and only the chosen word ends up in the feedback.  A bracket with fewer than two options (such as
+    a [1] reference) is left as ordinary text.
+*/
+var modChoice = {};         //entry id -> chosen option index for each modifier in the comment (-1 = not chosen)
+
+function parseModifiers(text){
+    var parts = [], re = /\[([^\[\]]+)\]/g, last = 0, m;
+    while ((m = re.exec(text)) !== null) {
+        var opts = (m[1].indexOf("|") !== -1 ? m[1].split("|") : m[1].split(","))
+            .map(function(o){ return o.trim(); })
+            .filter(function(o){ return o !== ""; });
+        if (opts.length < 2) { continue; }
+        if (m.index > last) { parts.push({ text: text.slice(last, m.index) }); }
+        parts.push({ options: opts });
+        last = m.index + m[0].length;
+    }
+    if (last < text.length) { parts.push({ text: text.slice(last) }); }
+    return parts;
+}
+
+function entryParts(entry){
+    if (!entry.parts) { entry.parts = parseModifiers(entry.text); }
+    return entry.parts;
+}
+
+function entryHasModifiers(entry){
+    return entryParts(entry).some(function(p){ return p.options; });
+}
+
+function entryById(id){
+    for (var i = 0; i < feedbackModel.length; i++) { if (feedbackModel[i].id === id) { return feedbackModel[i]; } }
+    return null;
+}
+
+//the text of a comment with the chosen options filled in, or null if a choice is still to be made
+function phraseValue(entry){
+    var choices = modChoice[entry.id] || [], k = 0, out = "";
+    var parts = entryParts(entry);
+    for (var i = 0; i < parts.length; i++) {
+        if (parts[i].options) {
+            var c = choices[k++];
+            if (c === undefined || c < 0 || c >= parts[i].options.length) { return null; }
+            out += parts[i].options[c];
+        } else {
+            out += parts[i].text;
+        }
+    }
+    return out + " ";
+}
+
+function setupModifiers(){
+    $("#checkboxList").on("change", "select.modifier", function(){
+        var id = parseInt(this.getAttribute("data-entry"), 10);
+        var entry = entryById(id);
+        if (!entry) { return; }
+        var choices = [];
+        $('select.modifier[data-entry="' + id + '"]').each(function(){
+            choices.push(this.value === "" ? -1 : parseInt(this.value, 10));
+        });
+        modChoice[id] = choices;
+        $(this).removeClass("needs-choice").removeAttr("aria-invalid");
+        if (this.value !== "") { $("#check" + id).prop("checked", true); }     //choosing means you want it
+    });
 }
 
 
@@ -204,27 +322,39 @@ function loadFeedbackText(text, name){
     fileName = name || "feedback.txt";
     unsavedChanges = false;
     updateSaveButton();
+    modChoice = {};
+    editingId = null;
+    confirmDeleteId = null;
     parseFeedback(text);
+    $("input[name=feedback]").prop("checked", false);
     renderFeedbackList();
+    $(document).trigger("fb:file-loaded");
 }
 
-//draw the checkbox list from the model (keeps ticked boxes ticked)
-function renderFeedbackList(focusId){
+//draw the checkbox list from the model (keeps ticked boxes ticked).
+//focus: an entry id (focus its checkbox) or a jQuery selector string
+var editMode = false;
+var editingId = null;           //entry being edited, if any
+var confirmDeleteId = null;     //entry waiting for "delete?" confirmation, if any
+
+function renderFeedbackList(focus){
     var checked = {};
     $('input[name="feedback"]:checked').each(function(){ checked[this.id] = true; });
 
-    var $list = $("#checkboxList").empty();
+    var $list = $("#checkboxList");
+    var scrollTop = $list.scrollTop();
+    $list.empty().toggleClass("edit-mode", editMode);
     var openHeading = null;     //heading entry of the section we're currently inside
 
     function addCommentRow(heading){
         var inputId = "addInput" + heading.id;
         var $row = $("<li class='add-comment'></li>").attr("data-heading", heading.id);
-        $row.append($("<button type='button' class='btn btn-link add-comment-toggle' aria-expanded='false'></button>")
+        $row.append($("<button type='button' class='btn btn-link add-comment-toggle' aria-expanded='false'></button>").attr("id", "addToggle" + heading.id)
             .text("+ Add a comment to this section")
             .attr("aria-label", "Add a comment to section " + heading.text.trim()));
         var $form = $("<form class='add-comment-form' hidden></form>");
         $form.append($("<label class='sr-only'></label>").attr("for", inputId).text("New comment for " + heading.text.trim()));
-        $form.append($("<input type='text' class='form-control'>").attr({id: inputId, placeholder: "Type a new comment"}));
+        $form.append($("<input type='text' class='form-control' spellcheck='true'>").attr({id: inputId, placeholder: "Type a new comment"}));
         $form.append("<button type='submit' class='btn btn-primary'>Add</button>");
         $form.append("<button type='button' class='btn btn-secondary add-comment-cancel'>Cancel</button>");
         $row.append($form);
@@ -243,11 +373,27 @@ function renderFeedbackList(focusId){
             if (openHeading) { addCommentRow(openHeading); openHeading = null; }
             $list.append(checkboxRow(entry, "\n\n", $("<i></i>").text("Insert line break in feedback text")));
         }
+        else if (editingId === entry.id) {
+            $list.append(editRow(entry));
+        }
         else {
-            $list.append(checkboxRow(entry, entry.text + " ", document.createTextNode(entry.text)));
+            $list.append(phraseRow(entry));
         }
     });
     if (openHeading) { addCommentRow(openHeading); }                //file ended inside a section
+    if (feedbackModel.some(function(e){ return e.type !== "blank"; })) { addSectionRow(); }
+
+    function addSectionRow(){
+        var $row = $("<li class='add-section'></li>");
+        $row.append($("<button type='button' class='btn btn-link add-section-toggle' id='addSectionToggle' aria-expanded='false'></button>").text("+ Add a new section"));
+        var $form = $("<form class='add-section-form' hidden></form>");
+        $form.append($("<label class='sr-only' for='addSectionInput'></label>").text("Heading for the new section"));
+        $form.append($("<input type='text' class='form-control' id='addSectionInput' spellcheck='true' placeholder='Type a section heading'>"));
+        $form.append("<button type='submit' class='btn btn-primary'>Add section</button>");
+        $form.append("<button type='button' class='btn btn-secondary add-section-cancel'>Cancel</button>");
+        $row.append($form);
+        $list.append($row);
+    }
 
     function checkboxRow(entry, value, labelContent){
         var id = "check" + entry.id;
@@ -257,7 +403,88 @@ function renderFeedbackList(focusId){
         return $li;
     }
 
-    if (focusId) { $("#check" + focusId).focus(); }
+    //a comment: plain text, or text with a drop-down wherever it has a [modifier]
+    function phraseRow(entry){
+        var id = "check" + entry.id;
+        var parts = entryParts(entry);
+        var $li = $("<li></li>");
+
+        if (!entryHasModifiers(entry)) {
+            $li = checkboxRow(entry, entry.text + " ", document.createTextNode(entry.text));
+            $li.find("input").attr("data-entry", entry.id);
+        } else {
+            $li.addClass("has-modifier");
+            var $box = $("<input type='checkbox' class='checkbox-larger alignCheck' name='feedback'>")
+                .attr({id: id, "data-entry": entry.id}).val(entry.text + " ").prop("checked", !!checked[id]);
+            var $text = $("<span class='alignCheckLabel phrase-text'></span>");
+            var names = [], k = 0, choices = modChoice[entry.id] || [];
+            parts.forEach(function(part, i){
+                if (part.options) {
+                    var selId = "mod" + entry.id + "-" + k;
+                    var $sel = $("<select class='modifier'></select>")
+                        .attr({id: selId, "data-entry": entry.id, "data-index": k,
+                               "aria-label": "Choose one of: " + part.options.join(", ")});
+                    $sel.append($("<option value=''></option>").text("choose…"));
+                    part.options.forEach(function(o, j){ $sel.append($("<option></option>").val(j).text(o)); });
+                    if (choices[k] !== undefined && choices[k] >= 0) { $sel.val(String(choices[k])); }
+                    $text.append($sel);
+                    names.push(selId);
+                    k++;
+                } else {
+                    var lblId = "lbl" + entry.id + "-" + i;
+                    $text.append($("<label></label>").attr({id: lblId, "for": id}).text(part.text));
+                    names.push(lblId);
+                }
+            });
+            $box.attr("aria-labelledby", names.join(" "));
+            $li.append($box).append($text);
+        }
+
+        if (editMode) { $li.append(rowActions(entry)); }
+        if (confirmDeleteId === entry.id) { $li.addClass("confirming").append(confirmBox(entry)); }
+        return $li;
+    }
+
+    function short(entry){
+        var t = entry.text.replace(/\s+/g, " ");
+        return t.length > 50 ? t.slice(0, 50) + "…" : t;
+    }
+
+    function rowActions(entry){
+        var $a = $("<span class='row-actions'></span>");
+        $a.append($("<button type='button' class='btn btn-sm btn-outline-secondary edit-comment'></button>")
+            .attr({id: "editBtn" + entry.id, "data-entry": entry.id, "aria-label": "Edit comment: " + short(entry)}).text("Edit"));
+        $a.append($("<button type='button' class='btn btn-sm btn-outline-secondary delete-comment'></button>")
+            .attr({id: "delBtn" + entry.id, "data-entry": entry.id, "aria-label": "Delete comment: " + short(entry)}).text("Delete"));
+        return $a;
+    }
+
+    function confirmBox(entry){
+        var $c = $("<div class='delete-confirm' role='group'></div>").attr("aria-label", "Confirm delete");
+        $c.append($("<span></span>").text("Delete this comment?"));
+        $c.append($("<button type='button' class='btn btn-sm btn-primary delete-yes'></button>").attr("data-entry", entry.id).text("Yes, delete"));
+        $c.append($("<button type='button' class='btn btn-sm btn-secondary delete-no' id='deleteNo'></button>").attr("data-entry", entry.id).text("Cancel"));
+        return $c;
+    }
+
+    function editRow(entry){
+        var inputId = "editInput" + entry.id;
+        var $li = $("<li class='edit-row'></li>");
+        var $form = $("<form class='edit-comment-form'></form>").attr("data-entry", entry.id);
+        $form.append($("<label class='sr-only'></label>").attr("for", inputId).text("Edit comment"));
+        $form.append($("<input type='text' class='form-control' spellcheck='true'>").attr("id", inputId).val(entry.text));
+        $form.append("<button type='submit' class='btn btn-primary'>Save</button>");
+        $form.append("<button type='button' class='btn btn-secondary edit-cancel'>Cancel</button>");
+        return $li.append($form);
+    }
+
+    $list.scrollTop(scrollTop);
+    var showButton = feedbackModel.some(function(e){ return e.type === "phrase"; });
+    $("#editModeToggle").prop("hidden", !showButton);
+
+    if (typeof focus === "number") { $("#check" + focus).focus(); }
+    else if (focus) { $(focus).focus(); }
+    $(document).trigger("fb:list-rendered");
 }
 
 //open the file with the File System Access API (keeps a handle so we can write back to it)
@@ -358,9 +585,150 @@ function setupAddComments(){
     });
 }
 
+/*
+    Editing and deleting comments.  "Edit comments" shows an Edit and a Delete button on every comment.
+*/
+function setupEditComments(){
+    var $list = $("#checkboxList");
+
+    $("#editModeToggle").on("click", function(){
+        editMode = !editMode;
+        editingId = null;
+        confirmDeleteId = null;
+        $(this).attr("aria-pressed", editMode ? "true" : "false");
+        renderFeedbackList();
+    });
+
+    $list.on("click", ".edit-comment", function(){
+        editingId = parseInt($(this).attr("data-entry"), 10);
+        confirmDeleteId = null;
+        renderFeedbackList("#editInput" + editingId);
+    });
+
+    function stopEditing(id){
+        editingId = null;
+        renderFeedbackList("#editBtn" + id);
+    }
+
+    $list.on("click", ".edit-cancel", function(){ stopEditing(editingId); });
+    $list.on("keydown", ".edit-comment-form input", function(e){
+        if (e.key === "Escape") { stopEditing(editingId); }
+    });
+
+    $list.on("submit", ".edit-comment-form", async function(e){
+        e.preventDefault();
+        var id = parseInt($(this).attr("data-entry"), 10);
+        var entry = entryById(id);
+        var text = cleanComment($(this).find("input").val());
+        if (!entry) { return; }
+        if (!text) {
+            flashStatus("#fadeListText", "A comment can't be empty. Use Delete to remove it", true);
+            $(this).find("input").focus();
+            return;
+        }
+        if (text !== entry.text) {
+            entry.text = text;
+            entry.raw = text;
+            entry.parts = null;
+            delete modChoice[id];
+            unsavedChanges = true;
+            editingId = null;
+            renderFeedbackList("#editBtn" + id);
+            $(document).trigger("fb:comment-changed", [id, false]);
+            await saveFeedbackFile(false, "updated");
+        } else {
+            stopEditing(id);
+        }
+    });
+
+    $list.on("click", ".delete-comment", function(){
+        confirmDeleteId = parseInt($(this).attr("data-entry"), 10);
+        editingId = null;
+        renderFeedbackList("#deleteNo");
+    });
+
+    $list.on("click", ".delete-no", function(){
+        var id = confirmDeleteId;
+        confirmDeleteId = null;
+        renderFeedbackList("#delBtn" + id);
+    });
+
+    $list.on("click", ".delete-yes", async function(){
+        var id = parseInt($(this).attr("data-entry"), 10);
+        var at = -1;
+        feedbackModel.forEach(function(en, i){ if (en.id === id) { at = i; } });
+        if (at < 0) { return; }
+
+        //work out where focus goes afterwards: the next comment's Edit button, else the previous one's
+        var next = null, i;
+        for (i = at + 1; i < feedbackModel.length && !next; i++) { if (feedbackModel[i].type === "phrase") { next = feedbackModel[i]; } }
+        for (i = at - 1; i >= 0 && !next; i--) { if (feedbackModel[i].type === "phrase") { next = feedbackModel[i]; } }
+
+        feedbackModel.splice(at, 1);
+        delete modChoice[id];
+        confirmDeleteId = null;
+        unsavedChanges = true;
+        renderFeedbackList(next ? "#editBtn" + next.id : "#editModeToggle");
+        $(document).trigger("fb:comment-changed", [id, true]);
+        await saveFeedbackFile(false, "deleted");
+    });
+}
+
+//add an empty section (a heading and its closing *) at the end of the file
+function cleanHeading(text){
+    return text.replace(/[\r\n]+/g, " ").replace(/^[#*\s]+/, "").trim();
+}
+
+function addSectionToModel(title){
+    var at = feedbackModel.length;
+    while (at > 0 && feedbackModel[at - 1].type === "blank") { at--; }      //stay above any blank lines at the end of the file
+    var heading = { id: nextEntryId++, type: "heading", text: title, raw: "#" + title };
+    var items = [
+        { id: nextEntryId++, type: "blank", text: "", raw: "" },
+        heading,
+        { id: nextEntryId++, type: "break", text: "*", raw: "*" }
+    ];
+    feedbackModel.splice.apply(feedbackModel, [at, 0].concat(items));
+    return heading;
+}
+
+function setupAddSections(){
+    var $list = $("#checkboxList");
+
+    function closeForm($row){
+        $row.find(".add-section-form").prop("hidden", true).find("input").val("");
+        $row.find(".add-section-toggle").attr("aria-expanded", "false").show().focus();
+    }
+
+    $list.on("click", ".add-section-toggle", function(){
+        $(this).attr("aria-expanded", "true").hide();
+        $(this).closest(".add-section").find(".add-section-form").prop("hidden", false).find("input").focus();
+    });
+    $list.on("click", ".add-section-cancel", function(){ closeForm($(this).closest(".add-section")); });
+    $list.on("keydown", ".add-section-form input", function(e){
+        if (e.key === "Escape") { closeForm($(this).closest(".add-section")); }
+    });
+
+    $list.on("submit", ".add-section-form", async function(e){
+        e.preventDefault();
+        var title = cleanHeading($(this).find("input").val());
+        if (!title) {
+            flashStatus("#fadeListText", "Please type a section heading first", true);
+            $(this).find("input").focus();
+            return;
+        }
+        var heading = addSectionToModel(title);
+        unsavedChanges = true;
+        renderFeedbackList("#addToggle" + heading.id);                  //ready to add its first comment
+        await saveFeedbackFile(false, "added", "Section");
+    });
+}
+
 //write the model back to the file the user loaded.
 //   with a file handle: overwrite that file.  Otherwise (or if that fails / forced) download the updated file.
-async function saveFeedbackFile(forceDownload){
+async function saveFeedbackFile(forceDownload, what, noun){
+    what = what || "added";
+    noun = noun || "Comment";
     var text = serializeFeedback();
 
     if (fileHandle && !forceDownload) {
@@ -374,12 +742,12 @@ async function saveFeedbackFile(forceDownload){
             await writable.close();
             unsavedChanges = false;
             updateSaveButton();
-            flashStatus("#fadeListText", "Comment added and saved to " + fileName, false);
+            flashStatus("#fadeListText", noun + " " + what + " and saved to " + fileName, false);
             return;
         } catch (e) {
             unsavedChanges = true;
             updateSaveButton(true);
-            flashStatus("#fadeListText", "Comment added, but the file could not be saved. Use \"Save updated file\"", true);
+            flashStatus("#fadeListText", noun + " " + what + ", but the file could not be saved. Use \"Save updated file\"", true);
             return;
         }
     }
@@ -387,7 +755,7 @@ async function saveFeedbackFile(forceDownload){
     //no file handle (browser can't write back): wait until the user asks for the download
     if (!fileHandle && !forceDownload) {
         updateSaveButton();
-        flashStatus("#fadeListText", "Comment added. Use \"Save updated file\" to keep it", false);
+        flashStatus("#fadeListText", noun + " " + what + ". Use \"Save updated file\" to keep it", false);
         return;
     }
 

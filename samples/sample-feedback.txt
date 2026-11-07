@@ -1,4 +1,6 @@
 #Section One
+This is [an excellent, a very good, a good, a satisfactory] report.
+Your analysis is [outstanding, thorough, adequate, limited] and shows [exceptional, strong, some, little] critical thinking.
 This is an excellent report.
 This is a very good report.
 This is a good report.

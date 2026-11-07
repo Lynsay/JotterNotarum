@@ -94,6 +94,7 @@
 		
 				<div class="col-md-6 form-group roundedCornerDiv"><!--for checkboxes-->
 					<h2 class="instructionHeader"><span class="step-badge">2</span><span>Select your feedback phrases</span></h2>
+					<p class="edit-toggle-row"><button type="button" id="editModeToggle" class="btn btn-outline-secondary btn-sm" aria-pressed="false" hidden>Edit comments</button></p>
 					<ul id="checkboxList"></ul><!--populated by JavaScript-->
 					<p class="list-status"><button type="button" id="saveFile" class="btn btn-primary" hidden>Save updated file</button> <span id="fadeListText" role="status" aria-live="polite"></span></p>
 					<button class="btn btn-secondary scrollup scrollButton">Scroll To Top</button>
@@ -104,7 +105,8 @@
 					<p>Click the button below to generate feedback text.  You can also add your own text to the generated comments.</p>
 					<p><button id="generate" class="btn btn-primary">Generate Feedback</button> <span id="fadeGenerateText" role="status" aria-live="polite"></span></p>
 
-					<textarea id="feedbackText" aria-label="Generated feedback text" class="form-control" rows="14"></textarea>
+					<textarea id="feedbackText" aria-label="Generated feedback text" class="form-control" rows="14" spellcheck="true"></textarea>
+					<p class="word-count" id="wordCount" role="status" aria-live="off">0 words</p>
 
 					<hr class="step-divider" />
 					<h2 class="instructionHeader"><span class="step-badge">4</span><span>Copy feedback and clear page</span></h2>

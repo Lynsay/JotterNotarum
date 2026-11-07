@@ -321,7 +321,7 @@ label.btn.btn-primary { cursor: pointer; margin: 0; position: relative; }
     text-align: center;
 }
 
-#checkboxList li:not(:has(.listSectionHeader)):not(.add-comment) {
+#checkboxList li:not(:has(.listSectionHeader)):not(.add-comment):not(.add-section) {
     display: flex;
     align-items: flex-start;
     gap: .75rem;
@@ -330,7 +330,7 @@ label.btn.btn-primary { cursor: pointer; margin: 0; position: relative; }
     border-radius: 10px;
     transition: background-color .12s;
 }
-#checkboxList li:not(:has(.listSectionHeader)):not(.add-comment):hover { background: var(--row-hover); }
+#checkboxList li:not(:has(.listSectionHeader)):not(.add-comment):not(.add-section):hover { background: var(--row-hover); }
 #checkboxList li:has(input:checked) { background: var(--accent-soft) !important; }
 
 .listSectionHeader {
@@ -346,8 +346,9 @@ label.btn.btn-primary { cursor: pointer; margin: 0; position: relative; }
 #checkboxList li:first-child .listSectionHeader { margin-top: 0; }
 
 /* per-section "add a comment" control */
-.add-comment { margin: .25rem 0 .5rem; padding: 0 .8rem; }
-.add-comment .btn-link {
+.add-comment, .add-section { margin: .25rem 0 .5rem; padding: 0 .8rem; }
+.add-section { margin-top: 1rem; padding-top: .5rem; border-top: 1px solid var(--line); }
+.add-comment .btn-link, .add-section .btn-link {
     padding: .3rem 0;
     font-size: .95rem;
     font-weight: 600;
@@ -355,10 +356,10 @@ label.btn.btn-primary { cursor: pointer; margin: 0; position: relative; }
     text-decoration: none;
     border-radius: 6px;
 }
-.add-comment .btn-link:hover { color: var(--link-hover); text-decoration: underline; }
-.add-comment-form { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-top: .25rem; }
-.add-comment-form[hidden] { display: none; }
-.add-comment-form .form-control {
+.add-comment .btn-link:hover, .add-section .btn-link:hover { color: var(--link-hover); text-decoration: underline; }
+.add-comment-form, .add-section-form { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-top: .25rem; }
+.add-comment-form[hidden], .add-section-form[hidden] { display: none; }
+.add-comment-form .form-control, .add-section-form .form-control {
     flex: 1 1 14rem;
     min-width: 0;
     background: var(--field-bg);
@@ -366,7 +367,7 @@ label.btn.btn-primary { cursor: pointer; margin: 0; position: relative; }
     border: 1px solid var(--control-border);
     border-radius: 10px;
 }
-.add-comment-form .form-control:focus { border-color: var(--accent-text); box-shadow: 0 0 0 3px var(--accent-text); }
+.add-comment-form .form-control:focus, .add-section-form .form-control:focus { border-color: var(--accent-text); box-shadow: 0 0 0 3px var(--accent-text); }
 .list-status { margin: 0 0 1rem; min-height: 1.5rem; }
 .list-status .btn[hidden] { display: none; }
 
@@ -638,3 +639,60 @@ main:focus { outline: none; }
 }
 /* the Word options are narrower now they sit in a half-width column, so stack them */
 .adv-col .export-grid { grid-template-columns: 1fr; gap: .25rem; }
+
+/* ---------- edit / delete comments, modifiers, word count ---------- */
+.edit-toggle-row { margin: 0 0 .5rem; text-align: right; }
+.edit-toggle-row[hidden], #editModeToggle[hidden] { display: none; }
+#editModeToggle[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+#checkboxList .row-actions { margin-left: auto; display: flex; gap: .35rem; flex-shrink: 0; }
+#checkboxList li.confirming { flex-wrap: wrap; }
+.delete-confirm { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; font-weight: 600; color: var(--ink); }
+.edit-row { display: block !important; }
+.edit-comment-form { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; width: 100%; }
+.edit-comment-form .form-control { flex: 1 1 14rem; background: var(--field-bg); color: var(--ink); border: 2px solid var(--control-border); }
+.edit-comment-form .form-control:focus { border-color: var(--accent-text); box-shadow: 0 0 0 3px var(--accent-text); }
+
+.phrase-text { flex: 1 1 auto; line-height: 2.2; }
+.phrase-text label { display: inline; margin: 0; font-weight: normal; }
+select.modifier {
+    background: var(--field-bg);
+    color: var(--ink);
+    border: 2px solid var(--control-border);
+    border-radius: 8px;
+    padding: .1rem .35rem;
+    margin: 0 .15rem;
+    font: inherit;
+    max-width: 100%;
+}
+select.modifier:focus { outline: 3px solid var(--accent-text); outline-offset: 1px; }
+select.modifier.needs-choice { border-color: var(--bad-line); background: var(--bad-soft); color: var(--bad-ink); }
+
+.word-count { margin: .35rem 0 1rem; color: var(--ink-soft); font-size: .9rem; text-align: right; }
+.edit-toggle-row:has(#editModeToggle[hidden]) { display: none; }
+
+.draft-badge {
+    margin-left: auto;
+    padding: 0 .5rem;
+    border: 1px solid var(--accent-text);
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--accent-soft);
+    align-self: center;
+    font-style: normal;
+}
+
+.btn-outline-secondary {
+    background: var(--field-bg);
+    color: var(--ink);
+    border: 2px solid var(--control-border);
+}
+.btn-outline-secondary:hover, .btn-outline-secondary:focus {
+    background: var(--accent-soft);
+    color: var(--ink);
+    border-color: var(--accent-text);
+}
+.btn-outline-secondary:focus-visible { outline: 3px solid var(--accent-text); outline-offset: 2px; box-shadow: none; }
+#editModeToggle[aria-pressed="true"], #editModeToggle[aria-pressed="true"]:hover { background: var(--accent); border-color: var(--accent); color: #fff; }

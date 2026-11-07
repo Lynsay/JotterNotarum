@@ -4,6 +4,11 @@ A browser-based comment-bank generator for student feedback. Load a .txt file of
 commonly used comments, tick the phrases you want, and copy the finished feedback.
 Open `index.html` in a browser; see `instructions.html` for how to format your comment file.
 
+Features: choices inside comments (`[excellent, very good, good]`), add / edit / delete
+comments (saved back to your file), word count and spellcheck, and on the Advanced page a
+student list, Word export and in-memory drafts per student. Everything runs in the browser;
+nothing is uploaded.
+
 Written by Dr Lynsay Shepherd in 2019, updated in 2026.
 
 ## Licence

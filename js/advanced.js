@@ -343,8 +343,16 @@
             $box.append($label);
         });
         $("#nextOption").prop("hidden", !names.length);
+        var previous = currentStudent;
         if (names.length) { selectStudent($box.find("input")[0]); }
         showSelectedStudent();
+
+        //first list: whatever is on the page already belongs to the first student.  Later lists: keep the
+        //previous student's work as a draft and show the new first student's.
+        if (previous) { storeDraft(previous); }
+        currentStudent = studentName();
+        if (previous) { applyDraft(currentStudent); }
+        refreshBadges();
     }
 
     function setupClassList() {
@@ -365,21 +373,116 @@
         $("#studentBox").on("change", "input", function () {
             showSelectedStudent();
             scrollToSelected();
+            switchStudent();
         });
     }
 
     //"Clear feedback" (handled by script.js) also moves on to the next student, if the box is ticked
     function setupClearNext() {
         $("#clearFeedback").on("click", function () {
-            if (!$("#autoNext").prop("checked") || !classList.length) { return; }
+            delete drafts[currentStudent];                          //cleared on purpose, so there is no draft to keep
+            if (!$("#autoNext").prop("checked") || !classList.length) { refreshBadges(); return; }
             var inputs = $("#studentBox input").toArray();
             var i = inputs.findIndex(function (el) { return el.checked; });
             if (i >= 0 && i + 1 < inputs.length) {
                 selectStudent(inputs[i + 1]);
+                currentStudent = studentName();
+                applyDraft(currentStudent);                         //the next student may already have a draft
                 flashStatus("#exportStatus", "Next student: " + inputs[i + 1].value, false);
             } else if (i >= 0) {
                 flashStatus("#exportStatus", "That was the last student in your list", false);
             }
+            refreshBadges();
+        });
+    }
+
+    /* ---------- drafts ----------
+       Unfinished feedback is kept for each student while the page is open, so you can move between
+       students without losing anything.  It lives in memory only: it is never saved or sent anywhere,
+       and it is gone when the page is closed. */
+    var drafts = {};            //student name -> { text, checked: {checkbox id: true}, choices: {entry id: [..]} }
+    var currentStudent = "";    //the student whose feedback is on the page right now
+
+    function captureState() {
+        var checked = {}, any = false;
+        $('input[name="feedback"]:checked').each(function () { checked[this.id] = true; any = true; });
+        return {
+            text: $("#feedbackText").val() || "",
+            checked: checked,
+            choices: JSON.parse(JSON.stringify(modChoice)),
+            any: any
+        };
+    }
+
+    function stateIsEmpty(st) { return !st.any && !st.text.trim(); }
+
+    function storeDraft(name) {
+        if (!name) { return; }
+        var st = captureState();
+        if (stateIsEmpty(st)) { delete drafts[name]; } else { drafts[name] = st; }
+    }
+
+    //put a student's draft (or a blank page) on the screen
+    function applyDraft(name) {
+        var d = drafts[name];
+        $('input[name="feedback"]').prop("checked", false);
+        modChoice = d ? JSON.parse(JSON.stringify(d.choices)) : {};
+        if (d) {
+            Object.keys(d.checked).forEach(function (id) { $("#" + id).prop("checked", true); });
+        }
+        if (feedbackModel.length) { renderFeedbackList(); }         //redraws the drop-downs from the saved choices
+        $("#feedbackText").val(d ? d.text : "");
+        updateWordCount();
+    }
+
+    //a "draft" label (words, not just colour) next to each student with unfinished feedback
+    function refreshBadges() {
+        $("#studentBox .student-row").each(function () {
+            var $row = $(this);
+            var name = $row.find("input").val();
+            var has = !!drafts[name] || (name === currentStudent && !stateIsEmpty(captureState()));
+            $row.find(".draft-badge").remove();
+            if (has) { $row.find("span").first().append($("<em class='draft-badge'></em>").text("draft")); }
+        });
+    }
+
+    function hasUnfinished() {
+        return Object.keys(drafts).length > 0 || (classList.length > 0 && !stateIsEmpty(captureState()));
+    }
+
+    function switchStudent() {
+        storeDraft(currentStudent);                                 //the page still shows the previous student
+        currentStudent = studentName();
+        applyDraft(currentStudent);
+        refreshBadges();
+    }
+
+    function setupDrafts() {
+        $("#checkboxList").on("change", refreshBadges);
+        $("#feedbackText").on("input", refreshBadges);
+        $("#generate").on("click", function () { setTimeout(refreshBadges, 0); });
+
+        //a new comments file means new checkboxes: keep the written feedback, drop old ticks and choices
+        $(document).on("fb:file-loaded", function () {
+            Object.keys(drafts).forEach(function (n) {
+                drafts[n].checked = {};
+                drafts[n].choices = {};
+                drafts[n].any = false;
+                if (!drafts[n].text.trim()) { delete drafts[n]; }
+            });
+            refreshBadges();
+        });
+
+        //an edited or deleted comment: forget choices made for its old wording in the other drafts
+        $(document).on("fb:comment-changed", function (e, id, deleted) {
+            Object.keys(drafts).forEach(function (n) {
+                delete drafts[n].choices[id];
+                if (deleted) { delete drafts[n].checked["check" + id]; }
+            });
+        });
+
+        window.addEventListener("beforeunload", function (e) {
+            if (hasUnfinished()) { e.preventDefault(); e.returnValue = ""; }
         });
     }
 
@@ -388,6 +491,7 @@
     $(function () {
         setupClassList();
         setupClearNext();
+        setupDrafts();
         setupCombinedFallback();
         showCombined();
 
