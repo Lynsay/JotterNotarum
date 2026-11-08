@@ -1,4 +1,11 @@
 # Jotter Notarum: Feedback Generator
+[![Accessibility](https://github.com/Lynsay/JotterNotarum/actions/workflows/a11y.yml/badge.svg)](https://github.com/Lynsay/JotterNotarum/actions/workflows/a11y.yml)
+[![Licence: AGPL v3](https://img.shields.io/github/license/Lynsay/JotterNotarum)](LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/Lynsay/JotterNotarum)](https://github.com/Lynsay/JotterNotarum/commits/main)
+[![Latest release](https://img.shields.io/github/v/release/Lynsay/JotterNotarum)](https://github.com/Lynsay/JotterNotarum/releases)
+![HTML/CSS/JavaScript](https://img.shields.io/badge/built%20with-HTML%20%7C%20CSS%20%7C%20JavaScript-4338ca)
+![No data uploaded](https://img.shields.io/badge/privacy-runs%20in%20your%20browser-4338ca)
+
 
 A browser-based comment-bank generator for student feedback. Load a .txt file of your
 commonly used comments, tick the phrases you want, and copy the finished feedback.
