@@ -1,0 +1,20 @@
+name: Accessibility
+
+# Runs axe-core on every page (light and dark, desktop and phone widths) whenever code is pushed
+# or a pull request is opened.  A red cross on a commit means at least one violation was found;
+# open the run and read the log to see which page, rule and element.
+on:
+  push:
+  pull_request:
+
+jobs:
+  axe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:a11y

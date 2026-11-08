@@ -21,7 +21,7 @@ Foundation. It is distributed in the hope that it will be useful, but WITHOUT AN
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the [LICENSE](LICENSE) file for details.
 
-## Third-party libraries used
+## Third-party libraries
 
 These are bundled under their own licences (MIT, or MIT/GPL-3.0 dual-licensed for JSZip), which remain in force for those files:
 
