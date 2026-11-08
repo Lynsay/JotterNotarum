@@ -1,0 +1,13 @@
+{
+  "name": "jotter-notarum-tests",
+  "private": true,
+  "description": "Automated accessibility checks for Jotter Notarum (not part of the site itself).",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "test:a11y": "node tests/a11y.js"
+  },
+  "devDependencies": {
+    "axe-core": "^4.10.0",
+    "puppeteer": "^25.0.0"
+  }
+}
