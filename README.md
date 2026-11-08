@@ -1,6 +1,6 @@
 # Jotter Notarum: Feedback Generator
 [![Accessibility](https://github.com/Lynsay/JotterNotarum/actions/workflows/a11y.yml/badge.svg)](https://github.com/Lynsay/JotterNotarum/actions/workflows/a11y.yml)
-[![Licence: AGPL v3](https://img.shields.io/github/license/Lynsay/JotterNotarum)](LICENSE)
+[![Licence: AGPL-3.0](https://img.shields.io/static/v1?label=licence&message=AGPL-3.0&color=4338ca)](LICENSE)
 [![Last commit](https://img.shields.io/github/last-commit/Lynsay/JotterNotarum)](https://github.com/Lynsay/JotterNotarum/commits/main)
 [![Latest release](https://img.shields.io/github/v/release/Lynsay/JotterNotarum)](https://github.com/Lynsay/JotterNotarum/releases)
 ![HTML/CSS/JavaScript](https://img.shields.io/badge/built%20with-HTML%20%7C%20CSS%20%7C%20JavaScript-4338ca)
