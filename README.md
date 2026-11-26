@@ -7,16 +7,26 @@
 ![No data uploaded](https://img.shields.io/static/v1?label=your%20data&message=stays%20on%20your%20computer&color=4338ca)
 
 
-A browser-based comment-bank generator for student feedback. Load a .txt file of your
-commonly used comments, tick the phrases you want, and copy the finished feedback.
-Open `index.html` in a browser; see `instructions.html` for how to format your comment file.
+## What is Jotter Notarum?
+
+Jotter Notarum is a comment-bank tool for marking. You load your own bank of frequently used feedback comments, tick the ones that apply to a student's work, and generate feedback that you can edit and copy into your marking system. It was first written in 2019 and given a new look in 2026.
+
+To get started, open `index.html` in a browser; see `instructions.html` for how to format your comment file.
 
 Features: choices inside comments (`[excellent, very good, good]`), add / edit / delete
 comments (saved back to your file), word count and spellcheck, and on the Advanced page a
 student list, Word export and in-memory drafts per student. Everything runs in the browser;
 nothing is uploaded.
 
-Written by Dr Lynsay Shepherd in 2019, updated in 2026.
+## The name
+
+A *jotter* is the term Scots use for a notebook, the kind used for taking notes at school. *Notarum* is Latin for "of the notes" (the genitive plural of *nota*, a note). Together: a notebook of notes.
+
+## Who made it?
+
+Written by [Dr Lynsay Shepherd](https://www.abertay.ac.uk/staff-search/dr-lynsay-shepherd/), a Reader in Cybersecurity and Human-Computer Interaction and a Senior Fellow of the Higher Education Academy (SFHEA). Her research looks at the human side of cybersecurity and gaming, from usable security and eye-tracking to serious games, embodied agents, extended reality and romance fraud prevention. She teaches secure web development, human-centred security and research methods, and is passionate about designing technology, and teaching, around how people really behave.
+
+Any issues or ideas? Email [lynsay.shepherd@abertay.ac.uk](mailto:lynsay.shepherd@abertay.ac.uk?Subject=%5BIssue%5D%20Jotter%20Notarum%3A%20Feedback%20Generator).
 
 ## Licence
 
