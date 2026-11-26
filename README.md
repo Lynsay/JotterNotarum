@@ -11,7 +11,9 @@
 
 Jotter Notarum is a comment-bank tool for marking. You load your own bank of frequently used feedback comments, tick the ones that apply to a student's work, and generate feedback that you can edit and copy into your marking system. It was first written in 2019 and given a new look in 2026, supported by Claude.
 
-To get started, open `index.html` in a browser; see `instructions.html` for how to format your comment file.
+**Use it online:** https://lynsay.github.io/JotterNotarum/
+
+Alternatively, download the files and open `index.html` in a browser. See the [Instructions page](https://lynsay.github.io/JotterNotarum/instructions.html) (`instructions.html`) for how to format your comment file.
 
 Features: choices inside comments (`[excellent, very good, good]`), add / edit / delete
 comments (saved back to your file), word count and spellcheck, and on the Advanced page a
@@ -34,7 +36,7 @@ Any issues or ideas? Email [lynsay.shepherd@abertay.ac.uk](mailto:lynsay.shepher
 
 If you use Jotter Notarum in your teaching or research, please cite it as:
 
-> Shepherd, L. A. (2026) *Jotter Notarum: Feedback Generator* [Software]. Available at: https://github.com/Lynsay/JotterNotarum
+> Shepherd, L. A. (2026) *Jotter Notarum: Feedback Generator* [Software]. Available at: https://lynsay.github.io/JotterNotarum/ (Source code: https://github.com/Lynsay/JotterNotarum)
 
 BibTeX:
 
@@ -43,8 +45,8 @@ BibTeX:
   author    = {Shepherd, Lynsay A.},
   title     = {Jotter Notarum: Feedback Generator},
   year      = {2026},
-  url       = {https://github.com/Lynsay/JotterNotarum},
-  note      = {Software}
+  url       = {https://lynsay.github.io/JotterNotarum/},
+  note      = {Software. Source code: https://github.com/Lynsay/JotterNotarum}
 }
 ```
 
