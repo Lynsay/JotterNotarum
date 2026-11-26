@@ -38,7 +38,7 @@ $( document ).ready(function() {
     //File System Access API so that added comments can be saved straight back to it; otherwise the
     //normal file input is used and the updated file is offered as a download.
     $('#fileSelector').click(function(e) {
-        if (window.showOpenFilePicker) {
+        if (window.showOpenFilePicker && !pickerBlocked) {
             e.preventDefault();
             openWithPicker();
         } else {
@@ -525,6 +525,19 @@ function fileProblem(file){
     return "";
 }
 
+//read a text file whatever way it was saved.  Notepad on Windows can save as UTF-8, UTF-16 or "ANSI"
+//(Windows-1252, where curly quotes and accents are single bytes that are not valid UTF-8).
+async function readTextFile(file){
+    var bytes = new Uint8Array(await file.arrayBuffer());
+    if (bytes.length >= 2 && bytes[0] === 0xFF && bytes[1] === 0xFE) { return new TextDecoder("utf-16le").decode(bytes); }
+    if (bytes.length >= 2 && bytes[0] === 0xFE && bytes[1] === 0xFF) { return new TextDecoder("utf-16be").decode(bytes); }
+    try {
+        return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    } catch (e) {
+        return new TextDecoder("windows-1252").decode(bytes);
+    }
+}
+
 //a document renamed to .txt comes through as nul characters and replacement characters
 function looksBinary(text){
     return text.indexOf("\u0000") !== -1 || (text.match(/�/g) || []).length > 3;
@@ -556,7 +569,7 @@ async function loadChosenFeedbackFile(file, handle){
     var problem = fileProblem(file);
     var text = "";
     if (!problem) {
-        try { text = await file.text(); } catch (e) { flashStatus("#fadeFileText", "Error reading file", true); return false; }
+        try { text = await readTextFile(file); } catch (e) { flashStatus("#fadeFileText", "Error reading file", true); return false; }
         problem = feedbackProblem(text);
     }
     if (problem) { flashStatus("#fadeFileText", problem, true); return false; }
@@ -566,17 +579,33 @@ async function loadChosenFeedbackFile(file, handle){
     return true;
 }
 
-//open the file with the File System Access API (Chrome, Edge): lets the page save changes back to the same file
+//open the file with the File System Access API (Chrome, Edge): lets the page save changes back to the same file.
+//Some computers (managed university PCs, for example) block this API; the page then uses the ordinary file
+//input instead, and saving becomes a download.
+var pickerBlocked = false;
+
 async function openWithPicker(){
+    var handles;
     try {
-        var handles = await window.showOpenFilePicker({
+        handles = await window.showOpenFilePicker({
             multiple: false,
             types: [{ description: "Text files", accept: { "text/plain": [".txt"] } }]
         });
+    } catch (e) {
+        if (e && e.name === "AbortError") { return; }               //the user just closed the dialog
+        pickerBlocked = true;                                       //blocked or unsupported here: use the ordinary file input from now on
+        readFileContents();
+        if (navigator.userActivation && navigator.userActivation.isActive) {
+            document.getElementById("fileSelector").click();
+        } else {
+            flashStatus("#fadeFileText", "Click Browse again to choose your file", false);
+        }
+        return;
+    }
+    try {
         var file = await handles[0].getFile();
         await loadChosenFeedbackFile(file, handles[0]);
     } catch (e) {
-        if (e && e.name === "AbortError") { return; }               //the user just closed the dialog
         flashStatus("#fadeFileText", "Error reading file", true);
     }
 }

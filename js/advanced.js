@@ -379,7 +379,7 @@
             var problem = fileProblem(file);
             var text = "";
             if (!problem) {
-                try { text = await file.text(); } catch (e) { problem = "Error reading file"; }
+                try { text = await readTextFile(file); } catch (e) { problem = "Error reading file"; }
             }
             if (!problem) { problem = classListProblem(text); }
             if (problem) { flashStatus("#classListStatus", problem, true); return; }
