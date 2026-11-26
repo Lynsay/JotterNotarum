@@ -28,6 +28,30 @@ Written by [Dr Lynsay Shepherd](https://www.abertay.ac.uk/staff-search/dr-lynsay
 
 Any issues or ideas? Email [lynsay.shepherd@abertay.ac.uk](mailto:lynsay.shepherd@abertay.ac.uk?Subject=%5BIssue%5D%20Jotter%20Notarum%3A%20Feedback%20Generator).
 
+## 🎓 Citing Jotter Notarum
+
+### The tool
+
+If you use Jotter Notarum in your teaching or research, please cite it as:
+
+> Shepherd, L. A. (2026) *Jotter Notarum: Feedback Generator* [Software]. Available at: https://github.com/Lynsay/JotterNotarum
+
+BibTeX:
+
+```bibtex
+@software{shepherd_jotter_notarum_2026,
+  author    = {Shepherd, Lynsay A.},
+  title     = {Jotter Notarum: Feedback Generator},
+  year      = {2026},
+  url       = {https://github.com/Lynsay/JotterNotarum},
+  note      = {Software}
+}
+```
+
+### The paper
+
+> Paper details to follow. **
+
 ## 📄 Licence
 
 Copyright (C) 2019-2026 Lynsay A. Shepherd
