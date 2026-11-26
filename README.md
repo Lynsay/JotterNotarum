@@ -50,7 +50,7 @@ BibTeX:
 
 ### The paper
 
-> Paper details to follow. **
+> Paper details to follow.
 
 ## 📄 Licence
 
