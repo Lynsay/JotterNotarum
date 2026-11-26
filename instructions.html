@@ -82,51 +82,121 @@
 
 			<div class="row ">
 					<div class="col-md-12 form-group roundedCornerDivInstruct">
-						<!--Using the system-->
-						<h2 class="instructionHeaderPage">Using the system (basic version)</h2>
-						<p>Below are the instructions for using Jotter Notarum, the student feedback generator.</p>
-						<br />
 
-						<h3 class="instructionHeaderPage">Step 1: Select your feedback comments file</h3>
-							<p>You need to select a .txt file to load into Jotter Notarum.  This file should contain your commonly used comments.  Hit "Browse" to select a file.</p>
-							<img class="img-fluid img-thumbnail instructionImages mx-auto d-block" src="gfx/stepOne.png" alt="step one image" />
+						<p>Choose a section to jump straight to it.</p>
 
-							<p>Your feedback .txt file must be formatted in a specific way.  Section headings must start with a <b>#</b>.  The end of a section is denoted by a new line containing a <b>*</b>.  Blank lines will be ignored.  Ensure each line of feedback ends with a fullstop.  To help you, a <a href="samples/sample-feedback.txt" target="_blank">sample feedback file</a> has been provided.</p>
-
-							<img class="img-fluid img-thumbnail instructionImages mx-auto d-block" src="gfx/feedbackEx.png" alt="feedback example image" />
-						
+						<nav id="pageMenu" class="page-menu" aria-labelledby="pageMenuTitle">
+							<h2 id="pageMenuTitle" class="page-menu-title">On this page</h2>
+							<ul class="page-menu-groups">
+								<li><a class="page-menu-main" href="#file-format">File formatting</a></li>
+								<li><a class="page-menu-main" href="#basic">Basic instructions</a></li>
+								<li><a class="page-menu-main" href="#advanced">Advanced instructions</a></li>
+							</ul>
+						</nav>
 
 
-						<h3 class="instructionHeaderPage">Step 2: Select your feedback phrases</h3>
-						<p>Select all the required pieces of feedback you wish to use for a particular student.  You also have the option to split the feedback into paragraphs by checking the relevant "<i>Insert line break in feedback text</i>" checkboxes.</p>
-						<p>To add a new comment to a section, choose "<i>+ Add a comment to this section</i>", type the comment and press "Add".  The comment is added to the end of that section and saved to your feedback file.  To start a new section, choose "<i>+ Add a new section</i>" at the bottom of the list, type a heading and press "Add section".  The new section is added to the end of your file, ready for you to add comments to.  In Chrome and Edge your browser will ask permission to edit the file the first time, and the file is updated automatically.  In other browsers, press the "Save updated file" button that appears and replace your old feedback file with the downloaded one.</p>
-						<p><b>Choices inside a comment.</b>  Put the options in square brackets, separated by commas, and the comment will show a drop-down menu in that spot: <code>This is [an excellent, a very good, a good] report.</code>  Pick an option and the comment is ticked for you; only the option you chose ends up in the feedback.  Include the small word before it in each option ("an excellent", "a good") so the grammar always works.  If an option needs a comma, separate the options with <b>|</b> instead.  You can use more than one set of brackets in a comment.  If you tick a comment and forget to choose, Generate Feedback will stop and highlight it.  A single item in brackets, such as a reference like [1], is treated as ordinary text.</p>
-						<p><b>Editing and deleting comments.</b>  Press "Edit comments" above the list to show an Edit and a Delete button beside every comment.  Edit changes the wording; Delete asks you to confirm.  Changes are saved to your feedback file in the same way as added comments (see above).</p>
+						<!--1. File formatting-->
+						<h2 class="instructionHeaderPage" id="file-format">File formatting</h2>
+						<p>Jotter Notarum reads two kinds of plain text (.txt) file: your <b>comments file</b> (used on both the basic and advanced versions) and a <b>class list</b> (advanced version only).  Both are ordinary text files you can write in Notepad or any text editor.</p>
+
+						<h3 class="instructionHeaderPage" id="comments-file">Comments file</h3>
+						<p>The comments file holds the pieces of feedback you use most often.  It must be formatted in a specific way:</p>
+						<ul>
+							<li>Section headings start with a <b>#</b>.</li>
+							<li>Put each comment on its own line, under its heading.  Ensure each comment ends with a fullstop.</li>
+							<li>The end of a section is a new line containing a <b>*</b>.  Each one adds an "<i>Insert line break in feedback text</i>" checkbox to the list, so you can split feedback into paragraphs.</li>
+							<li>Blank lines are ignored.</li>
+						</ul>
+						<p>For example:</p>
+<pre class="file-example"><code>#Introduction
+This is [an excellent, a very good, a good] report.
+Thank you for your submission.
+*
+
+#Conclusion
+Well done.
+*</code></pre>
+						<p>To help you, a <a href="samples/sample-feedback.txt" target="_blank">sample feedback file</a> has been provided.</p>
+
+						<h3 class="instructionHeaderPage" id="choices">Choices inside a comment</h3>
+						<p>Put the options in square brackets, separated by commas, and the comment will show a drop-down menu in that spot: <code>This is [an excellent, a very good, a good] report.</code>  Pick an option and the comment is ticked for you; only the option you chose ends up in the feedback.</p>
+						<ul>
+							<li>Include the small word before it in each option ("an excellent", "a good") so the grammar always works.</li>
+							<li>If an option needs a comma, separate the options with <b>|</b> instead.</li>
+							<li>You can use more than one set of brackets in a comment.</li>
+							<li>If you tick a comment and forget to choose, Generate Feedback will stop and show a pink message beside the drop-down.</li>
+							<li>A single item in brackets, such as a reference like [1], is treated as ordinary text.</li>
+						</ul>
+
+						<h3 class="instructionHeaderPage" id="class-list">Class list</h3>
+						<p>The class list is used on the <a href="advanced.html">Advanced</a> page.  It is a .txt file with one student name per line, written however you want the name to appear (for example "Surname, Forename").  Blank lines and repeated names are ignored.  Here is a <a href="samples/sample-class-list.txt" target="_blank">sample class list</a>.</p>
+
+						<h3 class="instructionHeaderPage" id="file-problems">If a file can't be used</h3>
+						<p>Jotter Notarum checks each file when you choose it.  If it can't be used, a pink message appears beside the Browse button and nothing on the page is changed.  A file is refused if:</p>
+						<ul>
+							<li>it isn't a .txt file (for example a Word document);</li>
+							<li>it is empty, or over 1 MB;</li>
+							<li>a comments file has no comments in it; or</li>
+							<li>a comments file is chosen where a class list is expected, or the other way round.</li>
+						</ul>
+						<p>When saving from Notepad, choose "UTF-8" in the Encoding box of the Save As window.  Files saved in other common encodings are also read correctly, including curly quotes and accents.</p>
+						<p class="back-to-menu"><a href="#pageMenu">Back to menu</a></p>
+
+
+						<!--2. Basic instructions-->
+						<h2 class="instructionHeaderPage" id="basic">Basic instructions</h2>
+						<p>The <a href="index.html">Home</a> page generates feedback in four steps.  Your files must be formatted as described under <a href="#file-format">File formatting</a>.</p>
+
+						<h3 class="instructionHeaderPage" id="basic-step-1">Step 1: Select your feedback comments file</h3>
+						<p>You need to select a .txt file to load into Jotter Notarum.  This file should contain your commonly used comments.  Hit "Browse" to select a file.</p>
+						<img class="img-fluid img-thumbnail instructionImages mx-auto d-block" src="gfx/stepOne.png" alt="step one image" />
+
+						<h3 class="instructionHeaderPage" id="basic-step-2">Step 2: Select your feedback phrases</h3>
+						<p>Select all the required pieces of feedback you wish to use for a particular student.  You also have the option to split the feedback into paragraphs by checking the relevant "<i>Insert line break in feedback text</i>" checkboxes.  If a comment has a drop-down menu, choose an option (see <a href="#choices">Choices inside a comment</a>).</p>
+						<p><b>Adding comments and sections.</b>  To add a new comment to a section, choose "<i>+ Add a comment to this section</i>", type the comment and press "Add".  The comment is added to the end of that section and saved to your feedback file.  To start a new section, choose "<i>+ Add a new section</i>" at the bottom of the list, type a heading and press "Add section".  The new section is added to the end of your file, ready for you to add comments to.</p>
+						<p><b>Editing and deleting comments.</b>  Press "Edit comments" above the list to show an Edit and a Delete button beside every comment.  Edit changes the wording; Delete asks you to confirm.</p>
+						<p><b>Saving your changes.</b>  In Chrome and Edge your browser will ask permission to edit the file the first time, and the file is updated automatically.  In other browsers (or if your computer blocks that permission), press the "Save updated file" button that appears and replace your old feedback file with the downloaded one.</p>
 						<img class="img-fluid img-thumbnail instructionImages mx-auto d-block" src="gfx/stepTwo.png" alt="step two image" />
 
-						
-						<h3 class="instructionHeaderPage">Step 3: Generate feedback text</h3>
+						<h3 class="instructionHeaderPage" id="basic-step-3">Step 3: Generate feedback text</h3>
 						<p>To generate the paragraph(s) of selected feedback, press the "Generate Feedback" button.  The text content of the selected checkboxes will appear in the text area below the button.</p>
-						<p>A word count appears under the text area.  You can type in the text area to adjust the feedback, and your browser's spellcheck (set to British English where your browser allows) will underline words it does not recognise.  The spellcheck is your browser's own and runs on your computer.</p>
+						<p>A word count appears under the text area.  You can type in the text area to adjust the feedback, and your browser's spellcheck will underline words it does not recognise.  The spellcheck is your browser's own and runs on your computer.</p>
 						<img class="img-fluid img-thumbnail instructionImages mx-auto d-block" src="gfx/stepThree.png" alt="step three image" />
 
-						
-						<h3 class="instructionHeaderPage">Step 4: Copy feedback and clear page</h3>
-						<p>Click the "Copy Feedback" button to copy the contents of the text area to your clipboard.  You will now be able to paste the feedback into My Learning Space.</p>
-						<p>Once you have copied the feedback for a student, click "Clear Page" to reset the checkboxes and text area.  You can now move on to selecting feedback for a different student. </p>
+						<h3 class="instructionHeaderPage" id="basic-step-4">Step 4: Copy feedback and clear page</h3>
+						<p>Click the "Copy Feedback" button to copy the contents of the text area to your clipboard.  You will now be able to paste the feedback into your Virtual Learning Environment.</p>
+						<p>Once you have copied the feedback for a student, click "Clear Page" to reset the checkboxes and text area.  You can now move on to selecting feedback for a different student.</p>
 						<img class="img-fluid img-thumbnail instructionImages mx-auto d-block" src="gfx/stepFour.png" alt="step four image" />
+						<p class="back-to-menu"><a href="#pageMenu">Back to menu</a></p>
 
 
+						<!--3. Advanced instructions-->
+						<h2 class="instructionHeaderPage" id="advanced">Advanced instructions</h2>
+						<p>The <a href="advanced.html">Advanced</a> page works like the basic version, with a student list added at the start and Word export at the end.  The steps open in order: each step stays locked, with a note saying why, until the one before it is done.</p>
 
-						<h2 class="instructionHeaderPage">Using the advanced version</h2>
-						<h3 class="instructionHeaderPage">Features</h3>
-						<p>The <a href="advanced.html">Advanced</a> page has the same steps as the main page, with a student list added at the start.</p>
-							
-						<p>In Step 1, load a .txt file with one student name per line (here is a <a href="samples/sample-class-list.txt" target="_blank">sample class list</a>).  The names appear in a small scrollable box, and the student you pick is highlighted.  Then load your comments file, select phrases and generate the feedback as usual.  The steps open in order: each step stays locked, with a note saying why, until the one before it is done.  If a file can't be used (for example, it isn't a .txt file, it is empty, or a comments file was chosen where a class list was expected), a message appears beside the Browse button and nothing on the page is changed.</p> 
-						
-						<p>In Step 5 you can copy the feedback, save it as a Word file for the selected student, or add it to one combined Word file, with each student starting on a new page.  "Clear feedback" empties the page and, if you leave the box ticked, selects the next student in your list.  In Chrome and Edge the combined file is updated in place.  In other browsers it is downloaded again each time you add a student.</p>
-						
+						<h3 class="instructionHeaderPage" id="adv-step-1">Step 1: Select your student list</h3>
+						<p>Load a class list .txt file with one student name per line (see <a href="#class-list">Class list</a>).  The names appear in a small scrollable box, and the student you pick is highlighted.  The list is read on your computer and kept in memory only.</p>
+
+						<h3 class="instructionHeaderPage" id="adv-step-2">Step 2: Select your feedback comments file</h3>
+						<p>Load your comments file exactly as in <a href="#basic-step-1">Step 1 of the basic version</a>.</p>
+
+						<h3 class="instructionHeaderPage" id="adv-step-3">Step 3: Select your feedback phrases</h3>
+						<p>Tick the phrases for the selected student.  Choices, adding comments and sections, and editing and deleting all work as described in <a href="#basic-step-2">Step 2 of the basic version</a>.</p>
+
+						<h3 class="instructionHeaderPage" id="adv-step-4">Step 4: Generate feedback text</h3>
+						<p>Press "Generate Feedback", then adjust the text if you wish.  The word count and spellcheck work as in <a href="#basic-step-3">Step 3 of the basic version</a>.</p>
+
+						<h3 class="instructionHeaderPage" id="adv-step-5">Step 5: Copy and export feedback</h3>
+						<p>Copy the feedback and paste it into your Virtual Learning Environment, or export it to Word:</p>
+						<ul>
+							<li><b>Export to a single Word file.</b>  "Save as a Word file" saves the feedback for the selected student as its own document.</li>
+							<li><b>Add to a combined Word file.</b>  Choose an existing file or start a new one, then press "Add to combined Word file".  Each student starts on a new page.  In Chrome and Edge the combined file is updated in place.  In other browsers it is downloaded again each time you add a student.</li>
+							<li><b>Clear feedback.</b>  Empties the page and, if you leave the box ticked, selects the next student in your list.</li>
+						</ul>
+
+						<h3 class="instructionHeaderPage" id="adv-drafts">Drafts</h3>
 						<p>Unfinished feedback is kept for each student while the page stays open: switch to another student and come back, and your ticks and text are still there.  Students with unfinished feedback are marked "draft" in the list.  Drafts are held in memory only, so they are lost if you close or reload the page (you will be warned first); export or copy feedback you want to keep.  Nothing is uploaded; see <a href="privacy.html">Privacy</a>.</p>
+						<p class="back-to-menu"><a href="#pageMenu">Back to menu</a></p>
 
 						<br />
 						<button class="btn btn-secondary scrollup scrollButton">Scroll To Top</button>

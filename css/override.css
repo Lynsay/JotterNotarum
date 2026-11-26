@@ -725,3 +725,46 @@ select.modifier.needs-choice { border-color: var(--bad-line); background: var(--
 .step-locked-note { margin: .25rem 0 .75rem; font-weight: 600; color: var(--ink); }
 .step-locked-note[hidden] { display: none; }
 .instructionHeader:focus { outline: none; }
+
+/* ---------- instructions page: menu, anchors, example file ---------- */
+html { scroll-padding-top: 1rem; }
+@media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+}
+
+.page-menu {
+    margin: 0 0 2rem;
+    padding: 1rem 1.25rem;
+    background: var(--well);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+.page-menu-title { margin: 0 0 .5rem; font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.page-menu ul { list-style: none; margin: 0; padding: 0; }
+.roundedCornerDivInstruct .page-menu ul { padding-left: 0; margin-bottom: 0; }
+.page-menu li { margin: 0 0 .35rem; }
+.page-menu-groups { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+.page-menu-groups > li { margin: 0; }
+.page-menu-main { display: inline-block; font-weight: 700; }
+@media (max-width: 767.98px) {
+    .page-menu-groups { grid-template-columns: 1fr; gap: 1rem; }
+}
+
+.back-to-menu { margin: 1.5rem 0 0; text-align: right; }
+
+pre.file-example {
+    margin: 0 0 1rem;
+    padding: .75rem 1rem;
+    background: var(--well);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    text-align: left;
+    text-indent: 0;
+}
+pre.file-example code { background: none; border: 0; padding: 0; color: inherit; font-size: .9rem; }
+
+/* the part of the page you jump to is easy to spot */
+h2.instructionHeaderPage:target, h3.instructionHeaderPage:target { text-decoration: underline; text-decoration-color: var(--accent-text); text-underline-offset: .3em; }
