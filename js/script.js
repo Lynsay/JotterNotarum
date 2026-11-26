@@ -86,7 +86,7 @@ function flashStatus(selector, message, isError){
     $(selector).stop(true).css("opacity", 0).text(message)
         .removeClass("status-ok status-error").addClass(cls)
         .animate({opacity:1}, 300)
-        .delay(4000)
+        .delay(isError ? 9000 : 4000)
         .animate({opacity:0}, 800, function(){
             $(this).text("").removeClass("status-ok status-error").css("opacity", 1);
         });
@@ -165,14 +165,21 @@ function generateFeedback(){
 
     //a ticked comment still has a choice to make (e.g. [excellent, good]): don't guess, point to it
     if ($unresolved.length) {
-        $("select.modifier").removeClass("needs-choice").removeAttr("aria-invalid");
-        $unresolved.addClass("needs-choice").attr("aria-invalid", "true");
-        flashStatus("#fadeGenerateText", "Choose an option for the highlighted comment" + ($unresolved.length > 1 ? "s" : "") + " first", true);
-        $unresolved.first().focus();
+        clearChoiceNeeded();
+        $unresolved.each(function(){
+            //one pink message per comment, under its sentence, shared by that comment's drop-downs
+            var msgId = "needed" + this.getAttribute("data-entry");
+            $(this).addClass("needs-choice").attr({"aria-invalid": "true", "aria-describedby": msgId});
+            if (!document.getElementById(msgId)) {
+                $("<span class='modifier-error status-error'></span>").attr("id", msgId).text("Choose an option").appendTo($(this).closest(".phrase-text"));
+            }
+        });
+        flashStatus("#fadeGenerateText", "Choose an option first", true);
+        $unresolved.first().focus();                                //scrolls the list to the comment and reads out the message
         return;
     }
 
-    $("select.modifier").removeClass("needs-choice").removeAttr("aria-invalid");
+    clearChoiceNeeded();
     $('#feedbackText').val(fullText);
     updateWordCount();
 
@@ -180,6 +187,16 @@ function generateFeedback(){
 }
 
 
+
+//take away the pink "Choose an option" marks (from every drop-down, or just one)
+function clearChoiceNeeded($selects){
+    ($selects || $("select.modifier")).each(function(){
+        var entry = this.getAttribute("data-entry");
+        $(this).removeClass("needs-choice").removeAttr("aria-invalid").removeAttr("aria-describedby");
+        //the message goes once none of that comment's drop-downs still needs a choice
+        if (!$('select.modifier.needs-choice[data-entry="' + entry + '"]').length) { $("#needed" + entry).remove(); }
+    });
+}
 
 //generate feedback error
 function generateFeedbackError(){
@@ -193,7 +210,8 @@ function clearPage(){
             this.checked = false; 
     }); 
     modChoice = {};
-    $("select.modifier").val("").removeClass("needs-choice").removeAttr("aria-invalid");
+    $("select.modifier").val("");
+    clearChoiceNeeded();
     $('#feedbackText').val('');
     updateWordCount();
     scrollPage();
@@ -272,6 +290,13 @@ function phraseValue(entry){
 }
 
 function setupModifiers(){
+    //un-ticking a comment drops its "choose an option" mark
+    $("#checkboxList").on("change", 'input[name="feedback"]', function(){
+        if (!this.checked && this.getAttribute("data-entry")) {
+            clearChoiceNeeded($('select.modifier[data-entry="' + this.getAttribute("data-entry") + '"]'));
+        }
+    });
+
     $("#checkboxList").on("change", "select.modifier", function(){
         var id = parseInt(this.getAttribute("data-entry"), 10);
         var entry = entryById(id);
@@ -281,7 +306,7 @@ function setupModifiers(){
             choices.push(this.value === "" ? -1 : parseInt(this.value, 10));
         });
         modChoice[id] = choices;
-        $(this).removeClass("needs-choice").removeAttr("aria-invalid");
+        clearChoiceNeeded($(this));
         if (this.value !== "") { $("#check" + id).prop("checked", true); }     //choosing means you want it
     });
 }
@@ -487,19 +512,69 @@ function renderFeedbackList(focus){
     $(document).trigger("fb:list-rendered");
 }
 
-//open the file with the File System Access API (keeps a handle so we can write back to it)
+/*
+    Checking a chosen file before it is used.  A bad file never replaces what is already on the page.
+*/
+var MAX_FILE_BYTES = 1024 * 1024;       //a comment file or class list is a few kilobytes; anything near 1 MB is the wrong file
+
+//problems visible before reading: wrong type, empty, far too big.  Returns a message, or "" if fine.
+function fileProblem(file){
+    if (!/\.txt$/i.test(file.name)) { return "“" + file.name + "” isn't a .txt file. Please choose a plain text file"; }
+    if (file.size === 0) { return "That file is empty"; }
+    if (file.size > MAX_FILE_BYTES) { return "That file is too big to be a text list (over 1 MB)"; }
+    return "";
+}
+
+//a document renamed to .txt comes through as nul characters and replacement characters
+function looksBinary(text){
+    return text.indexOf("\u0000") !== -1 || (text.match(/�/g) || []).length > 3;
+}
+
+function nonBlankLines(text){
+    return text.replace(/^﻿/, "").split(/\r?\n/).filter(function(l){ return l.trim() !== ""; });
+}
+
+//problems in the contents of a comments file
+function feedbackProblem(text){
+    if (looksBinary(text)) { return "That doesn't look like a plain text file"; }
+    var lines = nonBlankLines(text);
+    if (!lines.length) { return "That file is empty"; }
+    var headings = lines.filter(function(l){ return l.charAt(0) === "#"; });
+    var phrases = lines.filter(function(l){ return l.charAt(0) !== "#" && l.charAt(0) !== "*"; });
+    if (!phrases.length) { return "No comments found. Put one comment per line under each # heading (see Instructions)"; }
+    if (!headings.length) {
+        var withStop = phrases.filter(function(l){ return /[.!?]\s*$/.test(l); }).length;
+        if (withStop < phrases.length / 2) {
+            return "This doesn't look like a feedback file: no # section headings, and most lines don't end in a full stop. Is it your class list?";
+        }
+    }
+    return "";
+}
+
+//one chosen file, whichever way it was picked: checks it, loads it, reports the result.
+async function loadChosenFeedbackFile(file, handle){
+    var problem = fileProblem(file);
+    var text = "";
+    if (!problem) {
+        try { text = await file.text(); } catch (e) { flashStatus("#fadeFileText", "Error reading file", true); return false; }
+        problem = feedbackProblem(text);
+    }
+    if (problem) { flashStatus("#fadeFileText", problem, true); return false; }
+    fileHandle = handle || null;                                    //no handle means no way to write back, so saving is a download
+    loadFeedbackText(text, file.name);
+    flashStatus("#fadeFileText", "File read", false);
+    return true;
+}
+
+//open the file with the File System Access API (Chrome, Edge): lets the page save changes back to the same file
 async function openWithPicker(){
     try {
         var handles = await window.showOpenFilePicker({
             multiple: false,
             types: [{ description: "Text files", accept: { "text/plain": [".txt"] } }]
         });
-        var handle = handles[0];
-        var file = await handle.getFile();
-        var text = await file.text();
-        fileHandle = handle;
-        loadFeedbackText(text, file.name);
-        flashStatus("#fadeFileText", "File read", false);
+        var file = await handles[0].getFile();
+        await loadChosenFeedbackFile(file, handles[0]);
     } catch (e) {
         if (e && e.name === "AbortError") { return; }               //the user just closed the dialog
         flashStatus("#fadeFileText", "Error reading file", true);
@@ -508,24 +583,12 @@ async function openWithPicker(){
 
 //read contents of file (browsers without the File System Access API)
 function readFileContents(){
-
-    document.getElementById('fileSelector').onchange = function(){
+    document.getElementById('fileSelector').onchange = async function(){
         var file = this.files[0];
+        this.value = "";                                            //so choosing the same file again still counts
         if (!file) { return; }
-        var reader = new FileReader();
-        reader.onload = function(){
-            fileHandle = null;                                      //no way to write back, so saving is a download
-            loadFeedbackText(this.result, file.name);
-        };
-        try{
-            reader.readAsText(file);
-            flashStatus("#fadeFileText", "File read", false);
-        }
-        catch(e){
-            flashStatus("#fadeFileText", "Error reading file", true);
-        }
+        await loadChosenFeedbackFile(file, null);
     };
-
 }
 
 //make sure a typed comment is a single line that the file format will read back as a phrase

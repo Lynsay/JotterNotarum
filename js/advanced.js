@@ -309,6 +309,21 @@
         return names;
     }
 
+    //problems in the contents of a class list.  A comments file chosen by mistake is the likely one.
+    function classListProblem(text) {
+        if (looksBinary(text)) { return "That doesn't look like a plain text file"; }
+        var lines = nonBlankLines(text);
+        if (!lines.length) { return "That file is empty"; }
+        var marked = lines.filter(function (l) { return l.charAt(0) === "#" || l.charAt(0) === "*"; }).length;
+        var sentences = lines.filter(function (l) { return /[.!?]\s*$/.test(l) && l.split(/\s+/).length > 6; }).length;
+        var long = lines.filter(function (l) { return l.length > 100; }).length;
+        if (marked > 0 || sentences > lines.length / 4 || long > 0) {
+            return "That looks like a feedback comments file, not a class list. Use it in Step 2 instead";
+        }
+        if (!parseClassList(text).length) { return "Could not read any names from that file"; }
+        return "";
+    }
+
     //show the selected student's name in the export section
     function showSelectedStudent() {
         $(".selected-student").text(studentName() || "none selected");
@@ -353,6 +368,7 @@
         currentStudent = studentName();
         if (previous) { applyDraft(currentStudent); }
         refreshBadges();
+        refreshSteps();
     }
 
     function setupClassList() {
@@ -360,14 +376,17 @@
             var file = this.files[0];
             this.value = "";
             if (!file) { return; }
-            try {
-                var names = parseClassList(await file.text());
-                if (!names.length) { throw new Error("empty"); }
-                setClassList(names);
-                flashStatus("#classListStatus", names.length + " student" + (names.length === 1 ? "" : "s") + " loaded", false);
-            } catch (e) {
-                flashStatus("#classListStatus", "Could not read any names from that file", true);
+            var problem = fileProblem(file);
+            var text = "";
+            if (!problem) {
+                try { text = await file.text(); } catch (e) { problem = "Error reading file"; }
             }
+            if (!problem) { problem = classListProblem(text); }
+            if (problem) { flashStatus("#classListStatus", problem, true); return; }
+
+            var names = parseClassList(text);
+            setClassList(names);
+            flashStatus("#classListStatus", names.length + " student" + (names.length === 1 ? "" : "s") + " loaded", false);
         });
 
         $("#studentBox").on("change", "input", function () {
@@ -381,18 +400,67 @@
     function setupClearNext() {
         $("#clearFeedback").on("click", function () {
             delete drafts[currentStudent];                          //cleared on purpose, so there is no draft to keep
-            if (!$("#autoNext").prop("checked") || !classList.length) { refreshBadges(); return; }
+            if (!$("#autoNext").prop("checked") || !classList.length) { refreshBadges(); refreshSteps(); return; }
             var inputs = $("#studentBox input").toArray();
             var i = inputs.findIndex(function (el) { return el.checked; });
             if (i >= 0 && i + 1 < inputs.length) {
                 selectStudent(inputs[i + 1]);
                 currentStudent = studentName();
                 applyDraft(currentStudent);                         //the next student may already have a draft
-                flashStatus("#exportStatus", "Next student: " + inputs[i + 1].value, false);
+                flashStatus("#classListStatus", "Next student: " + inputs[i + 1].value, false);
             } else if (i >= 0) {
-                flashStatus("#exportStatus", "That was the last student in your list", false);
+                flashStatus("#classListStatus", "That was the last student in your list", false);
             }
             refreshBadges();
+            refreshSteps();
+        });
+    }
+
+    /* ---------- steps in order ----------
+       Step 2 opens once there is a student list, step 3 once there are comments, step 4 once something is
+       ticked (or text is already there), and step 5 once there is feedback.  A locked step says why, in words,
+       and its controls cannot be reached until the step before it is done. */
+    var STEP_RULES = {
+        2: { note: "Locked until you load your student list in Step 1.",
+             open: function () { return classList.length > 0; } },
+        3: { note: "Locked until you load your feedback comments file in Step 2.",
+             open: function () { return feedbackModel.some(function (e) { return e.type === "phrase"; }); } },
+        4: { note: "Locked until you tick at least one feedback phrase in Step 3.",
+             open: function () { return $('input[name="feedback"][data-entry]:checked').length > 0 || $.trim($("#feedbackText").val()) !== ""; } },
+        5: { note: "Locked until feedback has been generated in Step 4.",
+             open: function () { return $.trim($("#feedbackText").val()) !== ""; } }
+    };
+
+    function prepareSteps() {
+        $(".instructionHeader").each(function () {
+            var $h = $(this);
+            var n = parseInt($h.find(".step-badge").text(), 10);
+            var $card = $h.closest(".roundedCornerDiv").addClass("step-card").attr("data-step", n);
+            $h.attr("tabindex", "-1");                              //so focus can be put here when a step locks
+            if (STEP_RULES[n]) {
+                $h.nextAll().wrapAll("<div class='step-body'></div>");
+                $("<p class='step-locked-note' hidden></p>").text(STEP_RULES[n].note).insertAfter($h);
+            }
+        });
+    }
+
+    function refreshSteps() {
+        var locked = {};
+        Object.keys(STEP_RULES).forEach(function (n) { locked[n] = !STEP_RULES[n].open(); });
+
+        $(".step-card").each(function () {
+            var n = parseInt($(this).attr("data-step"), 10);
+            if (!STEP_RULES[n]) { return; }
+            var $card = $(this);
+            if (locked[n] && !$card.hasClass("locked") && $.contains(this, document.activeElement)) {
+                //the focused control is about to become unreachable: move focus to the nearest earlier step that is open
+                var k = n - 1;
+                while (k > 1 && locked[k]) { k--; }
+                $('.step-card[data-step="' + k + '"] .instructionHeader').focus();
+            }
+            $card.toggleClass("locked", locked[n]);
+            $card.find(".step-body").first().prop("inert", locked[n]);
+            $card.find(".step-locked-note").first().prop("hidden", !locked[n]);
         });
     }
 
@@ -433,6 +501,7 @@
         if (feedbackModel.length) { renderFeedbackList(); }         //redraws the drop-downs from the saved choices
         $("#feedbackText").val(d ? d.text : "");
         updateWordCount();
+        refreshSteps();
     }
 
     //a "draft" label (words, not just colour) next to each student with unfinished feedback
@@ -458,9 +527,10 @@
     }
 
     function setupDrafts() {
-        $("#checkboxList").on("change", refreshBadges);
-        $("#feedbackText").on("input", refreshBadges);
-        $("#generate").on("click", function () { setTimeout(refreshBadges, 0); });
+        $("#checkboxList").on("change", function () { refreshBadges(); refreshSteps(); });
+        $("#feedbackText").on("input", function () { refreshBadges(); refreshSteps(); });
+        $("#generate").on("click", function () { setTimeout(function () { refreshBadges(); refreshSteps(); }, 0); });
+        $(document).on("fb:list-rendered fb:file-loaded", refreshSteps);
 
         //a new comments file means new checkboxes: keep the written feedback, drop old ticks and choices
         $(document).on("fb:file-loaded", function () {
@@ -491,7 +561,9 @@
     $(function () {
         setupClassList();
         setupClearNext();
+        prepareSteps();
         setupDrafts();
+        refreshSteps();
         setupCombinedFallback();
         showCombined();
 

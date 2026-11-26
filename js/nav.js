@@ -13,7 +13,8 @@
     var themeBtn = document.getElementById("themeToggle");
     if (themeBtn) {
         var syncTheme = function () {
-            themeBtn.setAttribute("aria-pressed", document.documentElement.getAttribute("data-theme") === "dark");
+            //dark is the default, so the switch reads "Light mode" and is on only while light mode is showing
+            themeBtn.setAttribute("aria-pressed", document.documentElement.getAttribute("data-theme") === "light");
         };
         syncTheme();
         themeBtn.addEventListener("click", function () {
