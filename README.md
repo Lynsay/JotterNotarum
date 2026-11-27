@@ -30,7 +30,7 @@ A *jotter* is the term Scots use for a notebook, the kind used for taking notes 
 
 Written by [Dr Lynsay Shepherd](https://www.abertay.ac.uk/staff-search/dr-lynsay-shepherd/), a Reader in Cybersecurity and Human-Computer Interaction and a Senior Fellow of the Higher Education Academy (SFHEA). Her research looks at the human side of cybersecurity and gaming, from usable security and eye-tracking to serious games, embodied agents, extended reality and romance fraud prevention. She teaches secure web development, human-centred security and research methods, and is passionate about designing technology, and teaching, around how people really behave.
 
-Any issues or ideas? Email [lynsay.shepherd@abertay.ac.uk](mailto:lynsay.shepherd@abertay.ac.uk?Subject=%5BIssue%5D%20Jotter%20Notarum%3A%20Feedback%20Generator).
+Do you like the tool and want to send me some feedback? Any issues or ideas? Email [lynsay.shepherd@abertay.ac.uk](mailto:lynsay.shepherd@abertay.ac.uk?Subject=%5BIssue%5D%20Jotter%20Notarum%3A%20Feedback%20Generator).
 
 ## 🎓 Citing Jotter Notarum
 
