@@ -17,7 +17,7 @@ date-released: 2026-11-27
 license: AGPL-3.0-only
 repository-code: "https://github.com/Lynsay/JotterNotarum"
 url: "https://lynsay.github.io/JotterNotarum/"
-# doi: 10.5281/zenodo.0000000   # add the Zenodo concept DOI once you have it, then remove the leading #
+doi: 10.5281/zenodo.24574189  
 keywords:
   - feedback
   - marking
