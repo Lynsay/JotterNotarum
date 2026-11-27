@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+type: software
+title: "Jotter Notarum: Feedback Generator"
+abstract: >-
+  A browser-based comment-bank tool for marking. Load your own bank of frequently
+  used feedback comments, tick the ones that apply to a student's work, and
+  generate feedback to edit and copy into your marking system. Everything runs in
+  the browser and nothing is uploaded.
+authors:
+  - family-names: Shepherd
+    given-names: Lynsay A.
+    affiliation: Abertay University
+    orcid: "https://orcid.org/0000-0002-1082-1174"
+version: 1.0.1
+date-released: 2026-11-27
+license: AGPL-3.0-only
+repository-code: "https://github.com/Lynsay/JotterNotarum"
+url: "https://lynsay.github.io/JotterNotarum/"
+# doi: 10.5281/zenodo.0000000   # add the Zenodo concept DOI once you have it, then remove the leading #
+keywords:
+  - feedback
+  - marking
+  - comment bank
+  - higher education
+  - assessment
+  - accessibility
