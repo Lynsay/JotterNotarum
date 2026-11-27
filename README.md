@@ -5,6 +5,7 @@
 [![Latest release](https://img.shields.io/github/v/release/Lynsay/JotterNotarum)](https://github.com/Lynsay/JotterNotarum/releases)
 ![HTML/CSS/JavaScript](https://img.shields.io/badge/built%20with-HTML%20%7C%20CSS%20%7C%20JavaScript-4338ca)
 ![No data uploaded](https://img.shields.io/static/v1?label=your%20data&message=stays%20on%20your%20computer&color=4338ca)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24574189.svg)](https://doi.org/10.5281/zenodo.24574189)
 
 
 ## ❓ What is Jotter Notarum?
