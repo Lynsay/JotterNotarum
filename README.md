@@ -7,6 +7,7 @@
 ![No data uploaded](https://img.shields.io/static/v1?label=your%20data&message=stays%20on%20your%20computer&color=4338ca)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24574189.svg)](https://doi.org/10.5281/zenodo.24574189)
 
+![Jotter Notarum showing a loaded comments file and generated feedback](gfx/screenshot.png)
 
 ## ❓ What is Jotter Notarum?
 
