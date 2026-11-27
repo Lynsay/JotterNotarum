@@ -37,7 +37,7 @@ Any issues or ideas? Email [lynsay.shepherd@abertay.ac.uk](mailto:lynsay.shepher
 
 If you use Jotter Notarum in your teaching or research, please cite it as:
 
-> Shepherd, L. A. (2026) *Jotter Notarum: Feedback Generator* [Software]. Available at: https://lynsay.github.io/JotterNotarum/ (Source code: https://github.com/Lynsay/JotterNotarum)
+> Shepherd, L. A. (2026) *Jotter Notarum: Feedback Generator* [Software]. Available at: https://doi.org/10.5281/zenodo.24574189 (Live tool: https://lynsay.github.io/JotterNotarum/; source code: https://github.com/Lynsay/JotterNotarum)
 
 BibTeX:
 
@@ -46,6 +46,7 @@ BibTeX:
   author    = {Shepherd, Lynsay A.},
   title     = {Jotter Notarum: Feedback Generator},
   year      = {2026},
+  doi       = {10.5281/zenodo.24574189},
   url       = {https://lynsay.github.io/JotterNotarum/},
   note      = {Software. Source code: https://github.com/Lynsay/JotterNotarum}
 }
